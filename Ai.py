@@ -1,6 +1,6 @@
 from Player import Player
 
-class AIPlayer(Player):
+class Ai(Player):
     def __init__(self, number: int, color: str, header: str, columns: list, rows: list, difficulty: str):
         super().__init__(number, color, header, columns, rows)
         self.difficulty = difficulty  # Add difficulty level for AI

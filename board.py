@@ -40,6 +40,7 @@
 from os import system, name #sets the system name to name
 from Ship import Ship #imports the Ship class
 from Player import Player #imports the Player class
+from Ai import Ai #imports the Ai classs
 
 
 columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'] # Defining the column letters to be used for the cordinates
