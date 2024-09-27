@@ -84,29 +84,32 @@ def checkHit(shot: str, enemy: Player) -> None:
     if not hit:  # If no hit was detected, print MISS
         print("\nMISS!\n")
 
-    
-def shootShip() -> str: 
+def shootShip(ai_shot=None) -> str: 
     """
         shootShip(ship_locations: list)
 
         Sources: Team authored
 
-        Allows a player to input their desired shot coordinates and returns a string representing the coordinates
+        Allows a player to input their desired shot coordinates and returns a string representing the coordinates.
+        If ai_shot is provided, it uses that as the shot coordinate instead of prompting for input.
 
         Parameters
-            None
+            ai_shot: Optional string. The coordinate for AI to shoot. If None, prompts for human input.
     """
 
-    print("Choose your coordinate to shoot!") # Print a guiding statement to the user
-
-    while True: # Loop to validate the input coordinate
-        shot = input("Coordinate: ").upper() # Player inputs coordinate
-        if 2 <= len(shot) <= 3 and shot[0] in columns and shot[1] in str_rows: # If the coordinate is 2 or 3 characters long and the first character is a valid column and the second character is a valid row
-            if len(shot) == 3 and (shot[1] + shot[2] not in str_rows): # If the coordinate is three characters long and the two characters at the end aren't in the list of valid rows
-                continue # Stay in the loop
-            break # Break out of the loop
+    if ai_shot:  # If ai_shot is provided, use it
+        shot = ai_shot
+    else:  # Otherwise, prompt the human player
+        print("Choose your coordinate to shoot!")  # Print a guiding statement to the user
+        while True: # Loop to validate the input coordinate
+            shot = input("Coordinate: ").upper() # Player inputs coordinate
+            if 2 <= len(shot) <= 3 and shot[0] in columns and shot[1] in str_rows: # If the coordinate is 2 or 3 characters long and the first character is a valid column and the second character is a valid row
+                if len(shot) == 3 and (shot[1] + shot[2] not in str_rows): # If the coordinate is three characters long and the two characters at the end aren't in the list of valid rows
+                    continue # Stay in the loop
+                break # Break out of the loop
 
     return shot # Return the coordinate of the shot as a string
+
 
     
 
