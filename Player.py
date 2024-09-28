@@ -21,7 +21,7 @@
     * getShipLocations
         -Returns a list of strings where each string represents the location of one of the player's ships on the board.
     Sources of code: Chat GPT
-    Authors: Connor Bennudriti, Brinley Hull, Gianni Louisa, Kyle Moore, Ben Renner, Mark Maloney
+    Authors: Connor Bennudriti, Brinley Hull, Gianni Louisa, Kyle Moore, Ben Renner
     Creation Date: 9/7/2024
 """
 
@@ -53,63 +53,28 @@ class Player:
         self.ships = [] # A list of the player's ship objects
         self.strike_attempts = [] # A list containing a player's strikes
 
-    #Added by Mark Maloney 
-    def move_ship(self, hit_ship):
-        """
-            Moves a ship to a new location after being hit and forfeits the player's turn.
-
-            Parameters:
-                hit_ship: The ship object that was hit.
-        """
-        if hit_ship.moved:
-            print("This ship has already been moved.")
-            return
-
-        print(f"Ship hit at {hit_ship.hit_segments[-1]}. Would you like to move this ship? (yes/no)")
-        response = input().strip().lower()
-
-        if response == 'yes':
-            # Remove the hit segment from the ship
-            print("Enter new locations for the remaining ship (one segment per line):")
-            new_locations = []
-            for _ in range(len(hit_ship.locations) - 1):
-                new_location = input().strip().upper()
-                if new_location in self.getShipLocations():
-                    print("Location already occupied by another ship. Try again.")
-                else:
-                    new_locations.append(new_location)
-
-            if len(new_locations) == len(hit_ship.locations) - 1:
-                # Update the ship's location and mark it as moved
-                hit_ship.locations = new_locations
-                hit_ship.moved = True
-                print(f"Ship successfully moved to new locations: {new_locations}")
-                print("Your turn has been forfeited.")
-            else:
-                print("Invalid ship movement. No changes made.")
-        else:
-            print("Continuing without moving the ship.")
-
-    def process_strike(self, opponent, position):
-        """
-            Processes a strike attempt on the opponent and checks for hits or misses.
-
-            Parameters:
-                opponent: The opponent player object.
-                position: The board position to strike.
-        """
-        self.strike_attempts.append(position)
-        for ship in opponent.ships:
-            if ship.is_hit(position):
-                print(f"Hit! Ship at {position} has been struck.")
-                if not ship.destroyed:
-                    self.move_ship(ship)
-                else:
-                    print("Ship has been destroyed!")
-                return
-        print(f"Missed at {position}.")
-
+        """ 
+            (TEAM2 - JAKE) 
             
+            Adding a 2 member variables for keeping track of history.
+
+            Both variables are set in "checkHit" method of board.py
+            
+            last_strike_was_hit
+            - bool: initialized to False
+            - desc:
+            used to keep track of whether the last shot sent out by the player was a hit
+            since all strikes are kept in the "strike_attempts" array, the last entry corresponds to this
+
+            last_enemy_shot
+            - str or None: initialized to None
+            - desc:
+            Used to keep track of the last shot an enemy made against a player. If it's 'None', there was no shot or it was a miss.
+            Successful shots are stored as coordinate strings, eg "B4".
+        """
+        self.last_strike_was_hit = False # Was the last strike this player made a hit?
+        self.last_enemy_shot = None # Either 'None' (The enemy missed or the game just started) or a coordinate of the last hit ship segment
+
     #Gianni and Connor authored
     def convertTextToColor(self, text: str, color: str) -> str:
         """
