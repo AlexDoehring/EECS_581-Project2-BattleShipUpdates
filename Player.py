@@ -89,6 +89,26 @@ class Player:
                 print("Invalid ship movement. No changes made.")
         else:
             print("Continuing without moving the ship.")
+
+    def process_strike(self, opponent, position):
+        """
+            Processes a strike attempt on the opponent and checks for hits or misses.
+
+            Parameters:
+                opponent: The opponent player object.
+                position: The board position to strike.
+        """
+        self.strike_attempts.append(position)
+        for ship in opponent.ships:
+            if ship.is_hit(position):
+                print(f"Hit! Ship at {position} has been struck.")
+                if not ship.destroyed:
+                    self.move_ship(ship)
+                else:
+                    print("Ship has been destroyed!")
+                return
+        print(f"Missed at {position}.")
+
             
     #Gianni and Connor authored
     def convertTextToColor(self, text: str, color: str) -> str:
