@@ -71,6 +71,7 @@ def checkHit(shot: str, enemy: Player) -> None:
 
     for enemy_ship in enemy.ships: # Loop through all of the other player's ships
         if shot in enemy_ship.locations:  # Check if the shot hit one of the coordinates held in ship locations
+            enemy.last_enemy_shot = shot # (TEAM2 - JAKE) if the shot was a hit, update the enemy's state to record it -- needed for moving ships
             enemy_ship.hit_segments.append(shot)  # Add the section of the ship that was hit to the Ship object's list of hit segments
             print("\nHIT!\n")  # Print HIT to the console
             hit = True  # Set hit to True
@@ -82,7 +83,12 @@ def checkHit(shot: str, enemy: Player) -> None:
             break  # Break the loop after a hit
 
     if not hit:  # If no hit was detected, print MISS
+        enemy.last_enemy_shot = None # (TEAM2 - JAKE) if the shot was not a hit, update the enemy's state to show this
         print("\nMISS!\n")
+
+    # (TEAM2 - JAKE) previously, this was not returned.
+    # required for checking if the last shot made by a player was a hit (necessary for AI)
+    return hit 
 
 def shootShip(ai_shot=None) -> str: 
     """
@@ -159,6 +165,130 @@ def printFinalBoards():
     player_one.printStrikeBoard(player_zero) #prints player_one's strike board
     player_one.printBoard(player_zero) #prints player_one's board
 
+# (TEAM2 - JAKE)
+def grid_coord_to_board_string(x: int, y: int) -> str:
+    return columns[x] + str_rows[y] # translate a grid coordinate to a board string by concatenating the values in the arrays used for this
+# (TEAM2 - JAKE) End
+
+# (TEAM2 - JAKE)
+def make_grid_for_split_placement(grid: list, player: Player, enemy: Player, last_shot: str) -> list:
+    """
+        make_grid_for_split_placement   
+    
+        Makes a grid output specifically when a split-off ship needs to be placed.
+        Marks all spots hit by the other player and marks all spots taken up by another ship.
+        
+        Returns an array of strings which represents the board
+    """
+    for x in range(10): # for all x coordinates
+        for y in range(10): # for all y coordinates
+            coord = grid_coord_to_board_string(x, y) # translate them to a board string
+            if coord == last_shot: # if the board string is the last shot, it should be an "X" for a hit
+                grid[y][x] = "X" # shot was a hit 
+                continue # continue looping through coords
+            if coord in enemy.strike_attempts: # if shot was done by enemy, first set as "O" for miss, later overwritten if it was a hit
+                grid[y][x] = "O" # shot was tentatively a miss
+            for ship in player.ships: # look through all current player's ships
+                if coord in ship.locations and last_shot not in ship.locations: # if the coord was in a ship (that wasn't the one that was hit)
+                    if coord in ship.hit_segments: # if the shot was a hit
+                        grid[y][x] = "X" # make grid character an X
+                    else: # if the ship segment is still alive
+                        grid[y][x] = "+" # make the grid character a +
+                    break # no need to search through other ships
+    return grid # return the filled out grid
+
+
+# (TEAM2 - JAKE) End
+
+
+# (TEAM2 - JAKE)
+def place_split_ship(player: Player, enemy: Player, last_shot: str, split_ship: Ship, size: int) -> Ship | None:
+    """
+        place_split_ship
+
+        Sources: Jake, reuse of code from move_line
+
+        Performs the routine for moving ships if a player chooses to "split" a ship that's only been hit once.
+        
+        Returns the new ship or None.
+
+        Parameters
+            player:     the current player
+            enemy:      the opponent player
+            last_shot:  a string coordinate of the last hit space on the current player's board
+            split_ship: the ship that's being split
+            size:       the size of the new split ship (should be the old ship's size - 1)
+    """
+    x_size, y_size = 10, 10 # init grid size
+    grid = create_grid(x_size, y_size) # create grid (an arrow of length 10 strings of periods)
+    grid = make_grid_for_split_placement(grid, player, enemy, last_shot) # update the grid to show all shots, misses, and placed ships
+
+    clearAndPass() # clear the terminal
+    horizontal = True  # start with a horizontal ship
+
+    #Puts the ship in the center of the grid
+    line_pos_x = x_size // 2
+    line_pos_y = (y_size - size) // 2
+
+    while True: # runs until the ship position is confirmed or the player cancels
+        temp_grid = add_line_to_grid(grid, line_pos_x, line_pos_y, size, horizontal)  # a version of the grid that shows the area the ship will be placed
+        clearAndPass() # clear terminal
+        print("Move your new ship!")
+            
+        display_grid(temp_grid) # print the grid
+
+        move = input("Move (W=up, A=left, S=down, D=right, R=rotate, C=confirm, Q=cancel): ").upper() #gets the users input and converts it to an uppercase char
+        if move == 'W' and line_pos_x > 0:  #if input is w and the player wont go out of bounds, move the line up
+            line_pos_x -= 1 #moves the line up
+        elif move == 'S' and (line_pos_x < x_size - 1 if horizontal else line_pos_x + size - 1 < x_size - 1): #if input is s and the player wont go out of bounds, move the line down
+            line_pos_x += 1 #moves the line down
+        elif move == 'A' and line_pos_y > 0: #if input is a and the player wont go out of bounds, move the line left
+            line_pos_y -= 1 #moves the line left
+        elif move == 'D' and (line_pos_y < y_size - 1 if not horizontal else line_pos_y + size - 1 < y_size - 1): #if input is d and the player wont go out of bounds, move the line right
+            line_pos_y += 1 #moves the line right
+        elif move == 'R': #if input is r and the player wont go out of bounds, rotate the line
+            mid_offset = size // 2  #rotates the line around its center
+
+            if horizontal: #if the line is horizontal, rotate it to be vertical
+                new_pos_x = line_pos_x - mid_offset
+                new_pos_y = line_pos_y + mid_offset
+
+                if new_pos_x >= 0 and new_pos_x + size <= x_size: #checks to see if the new line position is in bounds
+                    line_pos_x = new_pos_x #it is, continue
+                    line_pos_y = new_pos_y
+                    horizontal = False
+                else: #its not, error
+                    print("Not enough space to rotate!")
+            else: #if the line is vertical, rotate it to be horizontal
+                new_pos_x = line_pos_x + mid_offset
+                new_pos_y = line_pos_y - mid_offset
+
+                if new_pos_y >= 0 and new_pos_y + size <= y_size: #checks to see if the new line position is in bounds
+                    line_pos_x = new_pos_x #it is, continue
+                    line_pos_y = new_pos_y
+                    horizontal = True
+                else: #its not, error
+                    print("Not enough space to rotate!")
+        elif move == 'C': #if the input is c, confirm the line
+            if check_overlap(grid, line_pos_x, line_pos_y, size, horizontal): #checks to make sure this line will not overlap with any other already confirmed lnes
+                print("Overlap detected! Move the line to a new position.")
+            else:
+                grid = add_confirm_to_grid(grid, line_pos_x, line_pos_y, size, horizontal) #add the confirmed line to the grid
+                coordinates = get_line_coordinates(line_pos_x, line_pos_y, size, horizontal) #adds the line cords to coordinates
+                translated_coords = [grid_coord_to_board_string(y,x) for x,y in coordinates] # translates each coordinate to a board string
+                out_ship = Ship(translated_coords) # creates the ship to return
+                out_ship.can_split = False # makes it so the ship can't be split again
+                print("Ship confirmed at position!") 
+                return out_ship  #returns the updated grid and the coordinates of the line
+        elif move == 'Q': #if the input is q, cancel placement
+            return None  #return none to exit the loop
+        else: #invalid input, error
+            print("Invalid move! Please use W, A, S, D, R, C, or Q.")
+    
+
+# (TEAM2 - JAKE) End
+
+
 def takeTurn(player: Player, opponent: Player) -> None:
     """
         takeTurn(player: Player)
@@ -179,6 +309,50 @@ def takeTurn(player: Player, opponent: Player) -> None:
     player.printBoard(opponent) # Print the player's board
     print(f"\nPlayer {player.number}'s turn!") # Print which player's turn it is
 
+    # (TEAM2 - JAKE)
+    splittable_ship = None # initialize possible ship that can be split
+    if player.last_enemy_shot is not None: # if the last shot against the current player wasn't a miss
+        for ship in player.ships: # loop through al player's ships
+            if ship.is_split_possible(player.last_enemy_shot): # check if the ship isn't destroyed and can be split
+                splittable_ship = ship # set it as potentially splittable ship
+    
+    did_split = False
+    if splittable_ship: # if a ship can be split
+        decision = "" # init player decision
+        while decision.upper() not in ("Y", "N", "YES", "NO"): # loop until player makes up their damn mind
+            clearAndPass() # looks nicer than having terminal text go on downward forever
+            enemy = player_one if player.number == 0 else player_zero # Determine the other player
+            player.printStrikeBoard(enemy) # Print the player's strike board
+            print() # Print just a new line for formatting
+            player.printBoard(opponent) # Print the player's board
+            print(f"\nPlayer {player.number}'s turn!") # Print which player's turn it is
+            print(f"Ouch! Looks like one of your ships at {player.last_enemy_shot} got hit for the first time.")
+            decision = input("Would you like to break off the hit segment and move the rest of the ship pieces around as a new ship? This will cost a turn. (y/n): ")
+        if decision.upper() not in ("Y", "YES"): # if the player didn't choose yes
+            splittable_ship.can_split = False # make sure the hit ship can no longer be split
+        else: # if the decision was yes
+            new_ship_size = splittable_ship.get_split_size() # get the size of the new ship broken off from original
+            result = place_split_ship(player, enemy, player.last_enemy_shot, ship, new_ship_size) # let player place the ship
+            if result is not None: # if the player didn't cancel placement
+                did_split = True
+                splittable_ship.abandon() # remove all segments except the hit one from the ship to be split and mark it as destroyed
+                player.ships.append(result) # add the new ship to the player's ships array
+            splittable_ship.can_split = False # mark the ship, whether it was split or not, as no longer splittable
+            clearAndPass() # clear terminal
+            player.printStrikeBoard(enemy) # Print the player's strike board
+            print() # Print just a new line for formatting
+            player.printBoard(opponent) # Print the player's board
+            print(f"\nPlayer {player.number}'s turn!") # Print which player's turn it is
+
+    if did_split: # if the player split, their turn is done
+        input("Press Enter and pass to the next player...\n") # Print a continue game line to the console
+        clearAndPass() # Clear the console for the next player's turn
+        input("Next player press enter to continue") # Print a continue game line to the console
+        return
+    # (TEAM2 - JAKE) End code
+
+            
+
     enemy_ship_locations = enemy.getShipLocations() # Determine the ship locations of the other player
 
     while True: # Perform a while loop to avoid duplicate shots
@@ -186,7 +360,7 @@ def takeTurn(player: Player, opponent: Player) -> None:
         if shot not in player.strike_attempts: # If the shot has not already been taken
             break # Break out of the loop
         print("Shot already taken.\n") # Notify player that the shot was a duplicate
-    checkHit(shot, enemy) # Check to see whether the shot was a hit or miss
+    player.last_strike_was_hit = checkHit(shot, enemy) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
     player.strike_attempts.append(shot) # Add the shot taken to the player's strike attempts
 
     input("Press Enter and pass to the next player...\n") # Print a continue game line to the console
@@ -229,10 +403,10 @@ def get_line_coordinates(line_pos_x, line_pos_y, size, horizontal=True): #functi
 def check_overlap(grid, line_pos_x, line_pos_y, size, horizontal=True): #function that check if a ship is overlapping a previously confirmed ship
     for i in range(size): #check for the entire length of the ship
         if horizontal: #if the ship is horizontal, check in this fashion
-            if grid[line_pos_x][line_pos_y + i] == '+': #if there is a plus in this position, return true
+            if grid[line_pos_x][line_pos_y + i] != '.': # (TEAM2 - JAKE) if there is not a period in this position, return true -- previously only checked for plus
                 return True  #overlap detected
         else: #the ship is horizontal, check in the fashion
-            if grid[line_pos_x + i][line_pos_y] == '+': #if there is a plus in this position, return true
+            if grid[line_pos_x + i][line_pos_y] != '.': # (TEAM2 - JAKE) if there is not a period in this position, return true -- previously only checked for plus
                 return True  #overlap detected
     return False #there is no overlap, return false
 
@@ -251,10 +425,12 @@ def move_line(grid, size, p1_selection): #moves and places a line of a given siz
 
     while True: #runs until the line is confirmed
         temp_grid = add_line_to_grid(grid, line_pos_x, line_pos_y, size, horizontal)  #creates a temproary version of the grid with the current line's position
+        clearAndPass() # (TEAM2 - JAKE) this looks so much better
         if p1_selection == False:#checks to see if p1 has confirmed a final board
             print("Player 0 Ship Placement Selection!")#they havent
         else:#me
             print("Player 1 Ship Placement Selection!")#they have
+        
         display_grid(temp_grid)#print the grid
 
         move = input("Move (W=up, A=left, S=down, D=right, R=rotate, C=confirm, Q=quit): ").upper() #gets the users input and converts it to an uppercase char
