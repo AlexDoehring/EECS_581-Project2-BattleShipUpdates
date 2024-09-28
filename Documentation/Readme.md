@@ -82,3 +82,7 @@ Symbol Key:
 ### 5. Recommendations
 
 To the next team that is in charge of our project, It might be worth choosing to get rid of the ship class and ship file completely because all it does at this point is keep track of the ship coordinates which can be confusing (and the ship class's one method is not even used).
+
+### 6. Moving Ships
+
+Once a ship gets hit, the player's ship that got hit has the option to move the ship to another location on thier board. The ship being moved will lose the segemnt that had been hit, and the player's turn will be forfeited. Each ship can only be moved once. 
