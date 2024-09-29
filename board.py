@@ -43,16 +43,6 @@ from Player import Player #imports the Player class
 from Ai import Ai #imports the Ai classs
 
 
-columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'] # Defining the column letters to be used for the cordinates
-rows = range(1, 11) # Range of rows that should be used for the board. In this case 11 rows, 1 for each number 1-10 and 1 for the header.
-str_rows = ['1', '2', '3', '4', '5', '6', '7', '8', '9', "10"] # Defining the number of rows of the board for easy string operations. Team authored
-header = '    ' + ' '.join(columns) # Defining the header of the board. # ChatGPT Assisted
-
-player_zero = Player(0, 'green', header, columns, rows) # Intitializes Player Number, color, header, columns, and rows
-player_one = Player(1, 'blue', header, columns, rows) # Intitializes Player Number, color, header, columns, and rows
-
-        
-
 def checkHit(shot: str, enemy: Player) -> None:
     """
         checkHit(shot: str, enemy: PLayer)
@@ -90,6 +80,7 @@ def checkHit(shot: str, enemy: Player) -> None:
     # required for checking if the last shot made by a player was a hit (necessary for AI)
     return hit 
 
+
 def shootShip(ai_shot=None) -> str: 
     """
         shootShip(ship_locations: list)
@@ -116,9 +107,6 @@ def shootShip(ai_shot=None) -> str:
 
     return shot # Return the coordinate of the shot as a string
 
-
-    
-
     
 #Gianni Louisa Authored, chatgpt assisted
 def checkWin():
@@ -130,6 +118,7 @@ def checkWin():
         Returns True if the game should continue, 
         Returns False if game is won and should end.
     """
+
     # Check if all ships of player_zero are destroyed
     if all(ship.destroyed for ship in player_zero.ships):#for every ship in player_zero's ships, check if they are true for destroyed
         print("======================================")#print-out
@@ -156,8 +145,9 @@ def checkWin():
     
     return True  # The game continues if neither player has won yet
 
-#prints the final boards for each player after the game is over
+
 def printFinalBoards():
+    """Prints the final boards for each player after the game is over."""
     print("player 0's board") #print-out
     player_zero.printStrikeBoard(player_one) #prints player_zero's strike board
     player_zero.printBoard(player_one)  #prints player_zero's board
@@ -501,6 +491,7 @@ def translateCoordinates(ship_tuples: list) -> list:
         all_ship_coordinates.append(ship_coordinates) # Add the list of ship coordinates to the list of ships
     
     return all_ship_coordinates # Return the translated ship coordinates
+
 #//start team authored
 def goodInput(): #runs until the user inputs a valid number of ships, then returns
     valid_num_ships = ['1','2','3','4','5'] #used to check if user chose the correct number of ships
@@ -515,8 +506,10 @@ def goodInput(): #runs until the user inputs a valid number of ships, then retur
             print("Error! Please input a valid number of ships to start.") #print error and try again
     return numofShips #returns numofShips
 #//stop team authored
+
 #//start team and ChatGPT authored
 def shipPlacement(nShips): #lets each player choose where they want there ships to be placed, and returns each players confirmed coordinates
+    """Handles ship placement in Player vs Player control flow."""
     p1_cords = [] #initializes p1's cords
     p2_cords = [] #initializes p2's cords
     p1_selection = False #sets p1_selection to false
@@ -551,6 +544,55 @@ def shipPlacement(nShips): #lets each player choose where they want there ships 
         input('Press Enter to continue')
     return p1_cords, p2_cords #returns both players ship coordinates
 
+# Authored by Drew Meyer
+def shipPlacementAI(nShips, player: Player, ai: Ai):
+    """
+    Allows a human player to place all `n` ships first, then generates the AI's ship placements using Ai.getShipPlacements.
+    
+    Parameters:
+        nShips (int): The number of ships to place.
+        player (Player): The human player instance.
+        ai (Ai): The AI opponent instance.
+        
+    Returns:
+        tuple: A tuple containing the human player's confirmed coordinates and the AI's confirmed coordinates.
+    """
+    # Human player ship placement
+    human_cords = []  # Initialize the human player's coordinates list
+    grid_size = 10  # Define the grid size (10x10)
+
+    grid = create_grid(grid_size, grid_size)  # Initialize the game grid for the human player
+    temp_numShips = nShips  # Temporary variable for remaining ships to place
+    
+    while temp_numShips > 0:  # Continue until all human ships are placed
+        grid, line_coordinates = move_line(grid, temp_numShips, p1_selection=True)  # Call move_line to place each ship
+        if grid is None:  # If the player chose to quit
+            print("Game quit.")  # Print a message
+            return None  # Exit the method
+        
+        human_cords.append(line_coordinates)  # Store the confirmed coordinates for each ship
+        temp_numShips -= 1  # Decrement the number of ships left to place
+        
+    # Display the final board for the human player
+    print("Final board for human player:")
+    display_grid(grid)
+
+    input("Human player, press Enter to confirm your ship placements and allow AI to place its ships...")  # Continue to AI
+
+    # AI ship placement using the getShipPlacements method
+    ai_cords = ai.getShipPlacements(nShips)  # Call Ai.getShipPlacements to generate the AI's ships
+    ai_translated_cords = []  # A list to store translated AI coordinates
+    
+    # Convert AI coordinates to match the grid format
+    for ship in ai_cords:
+        translated_ship = [grid_coord_to_board_string(x, y) for x, y in ship]
+        ai_translated_cords.append(translated_ship)
+    
+    print("AI has placed its ships.")
+
+    return human_cords, ai_translated_cords  # Return the coordinates for both players
+
+
 #inspiration from geek for geeks
 def clearAndPass():
     # for windows
@@ -560,13 +602,21 @@ def clearAndPass():
     else:
         _ = system('clear') #clear the terminal if on mac or linux
 
-#//stop team and ChatGPT authored
+# Authored by original team, adjusted to support AI opponents by Drew Meyer
 def main():
     # Drew : Human vs AI Control Flow
+    columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'] # Defining the column letters to be used for the cordinates
+    rows = range(1, 11) # Range of rows that should be used for the board. In this case 11 rows, 1 for each number 1-10 and 1 for the header.
+    str_rows = ['1', '2', '3', '4', '5', '6', '7', '8', '9', "10"] # Defining the number of rows of the board for easy string operations. Team authored
+    header = '    ' + ' '.join(columns) # Defining the header of the board. # ChatGPT Assisted
+    
     while True:
         if_ai = input("Please choose a human (1) or AI opponent (2): ")
-        if int(if_ai) == 1:
-            #//start team authored
+        if int(if_ai) == 1:  # input if_ai, 1 = human vs human, 2 = human vs ai
+            # Human vs Human Control Flow
+            player_zero = Player(0, 'green', header, columns, rows) # Intitializes Human Player 0: Number, color, header, columns, and rows
+            player_one = Player(1, 'blue', header, columns, rows)   # Intitializes Human Player 1: Number, color, header, columns, and rows
+
             p1_confirmed_coordinates = [] #initialize p1's cords
             p2_confirmed_coordinates = [] #initialize p2's cords
             numShips = goodInput() #calls goodInput and returns a valid number of ships for the game.
@@ -592,9 +642,25 @@ def main():
                 if not checkWin():  # Check if Player 1 wins
                     break #Game is over so break the loop
                     #//stop team authored
-        elif int(if_ai) == 2:
-            # AI CONTROL FLOW
-            print("Simulating AI game")
+        elif int(if_ai) == 2: 
+            # Human vs AI Control Flow
+            while True:  # loop control
+                player_zero = Player(0, 'green', header, columns, rows)  # Intitializes Human Player 0: Number, color, header, columns, and rows
+                ai_dif = input("Choose AI difficulty: \nChoose 'easy', 'medium' or 'hard'\n")  # Prompt user for difficulty
+                if ai_dif != 'easy' and ai_dif != 'medium' and ai_dif != 'hard':
+                    print("Invalid difficulty. Try again.")
+                else:
+                    player_one = Ai(1, 'red', header, columns, rows, difficulty=ai_dif) # Initialize Ai Player 1 with difficulty easy
+                    print("AI difficulty set to ", player_one.difficulty)
+                    break
+                    
+            p1_confirmed_coordinates = [] #initialize p1's cords
+            numShips = goodInput() #calls goodInput and returns a valid number of ships for the game.
+
+            # OBTAIN PLAYER 1 SHIP PLACEMENTS, GENERATE AI PLACEMENTS
+            # KYLE AND ALEX: Working on this section. Run the current version and start debugging the shipPlacementAI Method
+            result = shipPlacementAI(numShips, player=player_zero, ai=player_one) #calls shipPlacement and returns two lists containing each players ship coordinates or None if the player decides to quit
+
         else:
             print("Please select a valid option: Human (1) vs. AI (2)")
 
