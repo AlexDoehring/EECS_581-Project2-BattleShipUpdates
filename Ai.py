@@ -33,16 +33,19 @@ class Ai(Player):
     #Might need to add more parameters, i.e. opponents board for hard difficulty, last shot for medium difficulty
     def shootShip(self, opponent):
         if self.difficulty == 'easy':      # Easy difficulty (continuous random shots)
-            col = columns[random.randint(0, 9)]
-            row = str(random.randint(1, 10))
-            shot = row + col
-            self.strike_attempts.append(shot)
-            return shot
+            while True:
+                col = columns[random.randint(0, 9)] #Grab random column
+                row = str(random.randint(1, 10)) #Grab random row
+                shot = row + col #append both to make shot coordinate
+                if shot not in self.strike_attempts: #if the shot has not already been shot
+                    self.strike_attempts.append(shot) #append to shot attempts
+                    break #break out of the loop
+            return shot #return the shot
         elif self.difficulty == 'medium':  # Medium difficulty (random until hit, then adjacent)
             if self.last_hits: #If a shit was hit recently, shoot orthoganally
                 if len(self.last_hits) == 1: #if just one ship, shoot randomly above or below
-                    last_col = self.last_hits[0][0]
-                    last_row = int(self.last_hits[0][1:])
+                    last_col = self.last_hits[0][0] #grab the column
+                    last_row = int(self.last_hits[0][1:]) #
                     possible_shots = []
                     
                     # Add above coordinate
@@ -67,8 +70,10 @@ class Ai(Player):
                     for shot in possible_shots:
                         if shot in self.strike_attempts:
                             possible_shots.remove(shot)
-                            
-                    return random.choice(possible_shots)
+                    
+                    shot = random.choice(possible_shots)
+                    self.strike_attempts.append(shot)
+                    return shot
                 else:  # If multiple hits, only target the long-wise edges
                     possible_shots = []
 
@@ -105,8 +110,9 @@ class Ai(Player):
                         if shot in self.strike_attempts:
                             possible_shots.remove(shot)
 
-                    return random.choice(possible_shots)
-                
+                    shot = random.choice(possible_shots)
+                    self.strike_attempts.append(shot)
+                    return shot       
             else:
                 col = columns[random.randint(0, 9)]
                 row = str(random.randint(1, 10))

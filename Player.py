@@ -72,7 +72,7 @@ class Player:
             Used to keep track of the last shot an enemy made against a player. If it's 'None', there was no shot or it was a miss.
             Successful shots are stored as coordinate strings, eg "B4".
             
-            (Team1 - Alex)
+            (Team2 - Alex)
             last_hit
             -list of str: initialized to empty
             -desc:

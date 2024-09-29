@@ -100,6 +100,7 @@ def shootShip(opponent, ai=None) -> str: #If ai parameter is passed, calls ai sh
 
     if ai:  # If ai_shot is provided, use it
         shot = ai.shootShip(opponent)
+        return shot
     else:  # Otherwise, prompt the human player
         print("Choose your coordinate to shoot!")  # Print a guiding statement to the user
         while True: # Loop to validate the input coordinate
@@ -361,9 +362,6 @@ def takeTurn(player: Player, opponent: Player) -> None:
             input("Next player press enter to continue") # Print a continue game line to the console
             return
         # (TEAM2 - JAKE) End code
-
-                
-
         enemy_ship_locations = opponent.getShipLocations() # Determine the ship locations of the other player
 
         while True: # Perform a while loop to avoid duplicate shots
@@ -372,10 +370,10 @@ def takeTurn(player: Player, opponent: Player) -> None:
                 break # Break out of the loop
             print("Shot already taken.\n") # Notify player that the shot was a duplicate
         player.last_strike_was_hit = checkHit(shot, opponent) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
-        if player.last_strike_was_hit: # (TEAM1 - ALEX) Updates last hits if a shot hits, otherwise still hits
+        if player.last_strike_was_hit: # (TEAM2 - ALEX) Updates last hits if a shot hits, otherwise still hits
             player.last_hits.append(shot)
             
-        #(TEAM1 - ALEX)
+        #(TEAM2 - ALEX)
         #ADd Elif logic for when a ship is sunk, then empty the player.last_hits list
         
         
@@ -384,8 +382,8 @@ def takeTurn(player: Player, opponent: Player) -> None:
         input("Press Enter and pass to the next player...\n") # Print a continue game line to the console
         clearAndPass() # Clear the console for the next player's turn
         input("Next player press enter to continue") # Print a continue game line to the console
-        '''Team Authored End'''
-    
+    '''Team Authored End'''
+
 #//start Chat GPT authored
 def create_grid(x_size=10, y_size=10): #function that creates a grid filled with '.'
     return [['.' for _ in range(y_size)] for _ in range(x_size)] #fills the grid filled with '.'
