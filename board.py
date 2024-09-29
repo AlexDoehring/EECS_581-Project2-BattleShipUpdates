@@ -127,7 +127,7 @@ def shootShip(opponent, ai=None) -> str: #If ai parameter is passed, calls ai sh
 
     
 #Gianni Louisa Authored, chatgpt assisted
-def checkWin(player, opponent): #Alex: Added player parameter to print correct player's win
+def checkWin(player, opponent, turn): #Alex: Added player parameter to print correct player's win
     """
         checkWin()    
     
@@ -136,30 +136,54 @@ def checkWin(player, opponent): #Alex: Added player parameter to print correct p
         Returns True if the game should continue, 
         Returns False if game is won and should end.
     """
-
-    # Check if all ships of player_zero are destroyed
-    if all(ship.destroyed for ship in opponent.ships):#for every ship in player_zero's ships, check if they are true for destroyed
-        print("======================================")#print-out
-        print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
-        print("======================================")#print-out
-        print("      🚢💥 Player 1 Wins! 💥🚢")#print-out
-        print("======================================")#print-out
-        print("    All enemy ships have been sunk!")#print-out
-        print("======================================\n")#print-out
-        printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
-        return False  # The game ends when player 1 wins
-    
-    # Check if all ships of player_one are destroyed
-    if all(ship.destroyed for ship in opponent.ships):#for every ship in player_one's ships, check if they are true for destroyed
-        print("======================================") #print-out
-        print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
-        print("======================================")#print-out
-        print("      🚢💥 Player 0 Wins! 💥🚢")#print-out
-        print("======================================")#print-out
-        print("    All enemy ships have been sunk!")#print-out
-        print("======================================\n")#print-out
-        printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
-        return False  # The game ends when player 0 wins
+    if not isinstance(player, Ai) and not isinstance(opponent, Ai):
+        # Check if all ships of player_zero are destroyed
+        if turn == 0:
+        # Check if all ships of player_one are destroyed
+            if all(ship.destroyed for ship in player.ships):#for every ship in player_one's ships, check if they are true for destroyed
+                print("======================================") #print-out
+                print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
+                print("======================================")#print-out
+                print("      🚢💥 Player 0 Wins! 💥🚢")#print-out
+                print("======================================")#print-out
+                print("    All enemy ships have been sunk!")#print-out
+                print("======================================\n")#print-out
+                printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
+                return False  # The game ends when player 0 wins
+        else: 
+            if all(ship.destroyed for ship in opponent.ships):#for every ship in player_zero's ships, check if they are true for destroyed
+                print("======================================")#print-out
+                print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
+                print("======================================")#print-out
+                print("      🚢💥 Player 1 Wins! 💥🚢")#print-out
+                print("======================================")#print-out
+                print("    All enemy ships have been sunk!")#print-out
+                print("======================================\n")#print-out
+                printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
+                return False  # The game ends when player 1 wins
+    else:
+        if turn == 0:
+            if all(ship.destroyed for ship in opponent.ships): #for every ship in player_zero's ships, check if they are true for destroyed
+                print("======================================") #print-out
+                print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
+                print("======================================")#print-out
+                print("      🚢💥 Player Wins! 💥🚢")#print-out
+                print("======================================")#print-out
+                print("    All enemy ships have been sunk!")#print-out
+                print("======================================\n")#print-out
+                printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
+                return False  # The game ends when player 0 wins
+        else:
+            if all(ship.destroyed for ship in opponent.ships):#for every ship in player_zero's ships, check if they are true for destroyed
+                print("======================================")#print-out
+                print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
+                print("======================================")#print-out
+                print("      🚢💥 AI Wins! 💥🚢")#print-out
+                print("======================================")#print-out
+                print("    All enemy ships have been sunk!")#print-out
+                print("======================================\n")#print-out
+                printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
+                return False  # The game ends when player 1 wins
     
     return True  # The game continues if neither player has won yet
 
@@ -678,10 +702,10 @@ def main():
 
             # Player 0 turn
             takeTurn(player_zero, player_one) # Player zero takes his turn. Team authored
-            if not checkWin(player_zero, player_one):  # Check if Player 0 wins
+            if not checkWin(player_zero, player_one, 0):  # Check if Player 0 wins
                 break #Game is over so break the loop
             takeTurn(player_one, player_zero) # Player one takes his turn. Team authored
-            if not checkWin(player_one, player_zero):  # Check if Player 1 wins
+            if not checkWin(player_one, player_zero, 1):  # Check if Player 1 wins
                 break #Game is over so break the loop
                 #//stop team authored
     elif int(if_ai) == 2: 
@@ -720,12 +744,12 @@ def main():
 
             # Player 0 turn
             takeTurn(player_zero, ai_player) # Player zero takes his turn. Team authored
-            if not checkWin(player_zero, ai_player):  # Check if Player 0 wins
+            if not checkWin(player_zero, ai_player, 0):  # Check if Player 0 wins
                 break #Game is over so break the loop
             
             
             takeTurn(ai_player, player_zero) # Player one takes his turn. Team authored
-            if not checkWin(ai_player, player_zero):  # Check if AI wins
+            if not checkWin(ai_player, player_zero, 1):  # Check if AI wins
                 break #Game is over so break the loop
                 #//stop team authored
 
