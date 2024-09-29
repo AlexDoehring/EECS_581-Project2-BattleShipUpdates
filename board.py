@@ -127,7 +127,7 @@ def shootShip(opponent, ai=None) -> str: #If ai parameter is passed, calls ai sh
 
     
 #Gianni Louisa Authored, chatgpt assisted
-def checkWin(player, opponent): #Alex: Added player parameter to print correct player's win
+def checkWin(player): #Alex: Added player parameter to print correct player's win
     """
         checkWin()    
     
@@ -146,7 +146,7 @@ def checkWin(player, opponent): #Alex: Added player parameter to print correct p
         print("======================================")#print-out
         print("    All enemy ships have been sunk!")#print-out
         print("======================================\n")#print-out
-        printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
+        printFinalBoards() #prints the final boards for each player after the game is over
         return False  # The game ends when player 1 wins
     
     # Check if all ships of player_one are destroyed
@@ -158,7 +158,7 @@ def checkWin(player, opponent): #Alex: Added player parameter to print correct p
         print("======================================")#print-out
         print("    All enemy ships have been sunk!")#print-out
         print("======================================\n")#print-out
-        printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
+        printFinalBoards() #prints the final boards for each player after the game is over
         return False  # The game ends when player 0 wins
     
     return True  # The game continues if neither player has won yet
@@ -317,13 +317,11 @@ def takeTurn(player: Player, opponent: Player) -> None:
             
         player.last_strike_was_hit = checkHit(shot, opponent, True) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
         
-        if player.last_strike_was_hit: # (TEAM2 - ALEX) Updates last hits if a shot hits, otherwise still hits
-            player.last_hits.append(shot)    
-        #(TEAM2 - ALEX)
-        #When a ship is sunk, then empty the player.last_hits list
-        for ship in opponent.ships:
-            if ship.destroyed and ship.hit_segments == player.last_hits:
-                player.last_hits = []
+        if player.last_strike_was_hit: # (TEAM1 - ALEX) Updates last hits if a shot hits, otherwise still hits
+            player.last_hits.append(shot)
+            
+        #(TEAM1 - ALEX)
+        #ADd Elif logic for when a ship is sunk, then empty the player.last_hits list
 
         player.strike_attempts.append(shot) # Add the shot taken to the player's strike attempts
         
@@ -387,6 +385,10 @@ def takeTurn(player: Player, opponent: Player) -> None:
         player.last_strike_was_hit = checkHit(shot, opponent, False) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
         if player.last_strike_was_hit: # (TEAM2 - ALEX) Updates last hits if a shot hits, otherwise still hits
             player.last_hits.append(shot)
+            
+        #(TEAM2 - ALEX)
+        #ADd Elif logic for when a ship is sunk, then empty the player.last_hits list
+        
         
         player.strike_attempts.append(shot) # Add the shot taken to the player's strike attempts
      
@@ -673,10 +675,10 @@ def main():
 
                 # Player 0 turn
                 takeTurn(player_zero, player_one) # Player zero takes his turn. Team authored
-                if not checkWin(player_zero, player_one):  # Check if Player 0 wins
+                if not checkWin(player_zero):  # Check if Player 0 wins
                     break #Game is over so break the loop
                 takeTurn(player_one, player_zero) # Player one takes his turn. Team authored
-                if not checkWin(player_one, player_zero):  # Check if Player 1 wins
+                if not checkWin(player_one):  # Check if Player 1 wins
                     break #Game is over so break the loop
                     #//stop team authored
         elif int(if_ai) == 2: 
@@ -715,12 +717,12 @@ def main():
 
                 # Player 0 turn
                 takeTurn(player_zero, ai_player) # Player zero takes his turn. Team authored
-                if not checkWin(player_zero, ai_player):  # Check if Player 0 wins
+                if not checkWin(player_zero):  # Check if Player 0 wins
                     break #Game is over so break the loop
                 
                 
                 takeTurn(ai_player, player_zero) # Player one takes his turn. Team authored
-                if not checkWin(ai_player, player_zero):  # Check if AI wins
+                if not checkWin(ai_player):  # Check if AI wins
                     break #Game is over so break the loop
                     #//stop team authored
         else:
