@@ -296,76 +296,95 @@ def takeTurn(player: Player, opponent: Player) -> None:
         Parameters
             player: a Player instance whose turn it is
     """
+    if isinstance(player, Ai):
+        enemy_ship_locations = opponent.getShipLocations() # Determine the ship locations of the other player
 
-    player.printStrikeBoard(opponent) # Print the player's strike board
-    print() # Print just a new line for formatting
-    player.printBoard(opponent) # Print the player's board
-    print(f"\nPlayer {player.number}'s turn!") # Print which player's turn it is
+        shot = shootShip(opponent, player) # Allow the player to choose a coordinate to shoot
+            
+        player.last_strike_was_hit = checkHit(shot, opponent) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
+        
+        if player.last_strike_was_hit: # (TEAM1 - ALEX) Updates last hits if a shot hits, otherwise still hits
+            player.last_hits.append(shot)
+            
+        #(TEAM1 - ALEX)
+        #ADd Elif logic for when a ship is sunk, then empty the player.last_hits list
+        
+        
+        player.strike_attempts.append(shot) # Add the shot taken to the player's strike attempts
+        
+        clearAndPass() # Clear the console for the next player's turn
+        input("Next player press enter to continue") # Print a continue game line to the console
+        '''Team Authored End'''
+    else:  
+        player.printStrikeBoard(opponent) # Print the player's strike board
+        print() # Print just a new line for formatting
+        player.printBoard(opponent) # Print the player's board
+        print(f"\nPlayer {player.number}'s turn!") # Print which player's turn it is
 
-    # (TEAM2 - JAKE)
-    splittable_ship = None # initialize possible ship that can be split
-    if player.last_enemy_shot is not None: # if the last shot against the current player wasn't a miss
-        for ship in player.ships: # loop through al player's ships
-            if ship.is_split_possible(player.last_enemy_shot): # check if the ship isn't destroyed and can be split
-                splittable_ship = ship # set it as potentially splittable ship
-    
-    did_split = False
-    if splittable_ship: # if a ship can be split
-        decision = "" # init player decision
-        while decision.upper() not in ("Y", "N", "YES", "NO"): # loop until player makes up their damn mind
-            clearAndPass() # looks nicer than having terminal text go on downward forever
-            player.printStrikeBoard(opponent) # Print the player's strike board
-            print() # Print just a new line for formatting
-            player.printBoard(opponent) # Print the player's board
-            print(f"\nPlayer {player.number}'s turn!") # Print which player's turn it is
-            print(f"Ouch! Looks like one of your ships at {player.last_enemy_shot} got hit for the first time.")
-            decision = input("Would you like to break off the hit segment and move the rest of the ship pieces around as a new ship? This will cost a turn. (y/n): ")
-        if decision.upper() not in ("Y", "YES"): # if the player didn't choose yes
-            splittable_ship.can_split = False # make sure the hit ship can no longer be split
-        else: # if the decision was yes
-            new_ship_size = splittable_ship.get_split_size() # get the size of the new ship broken off from original
-            result = place_split_ship(player, opponent, player.last_enemy_shot, ship, new_ship_size) # let player place the ship
-            if result is not None: # if the player didn't cancel placement
-                did_split = True
-                splittable_ship.abandon() # remove all segments except the hit one from the ship to be split and mark it as destroyed
-                player.ships.append(result) # add the new ship to the player's ships array
-            splittable_ship.can_split = False # mark the ship, whether it was split or not, as no longer splittable
-            clearAndPass() # clear terminal
-            player.printStrikeBoard(opponent) # Print the player's strike board
-            print() # Print just a new line for formatting
-            player.printBoard(opponent) # Print the player's board
-            print(f"\nPlayer {player.number}'s turn!") # Print which player's turn it is
+        # (TEAM2 - JAKE)
+        splittable_ship = None # initialize possible ship that can be split
+        if player.last_enemy_shot is not None: # if the last shot against the current player wasn't a miss
+            for ship in player.ships: # loop through al player's ships
+                if ship.is_split_possible(player.last_enemy_shot): # check if the ship isn't destroyed and can be split
+                    splittable_ship = ship # set it as potentially splittable ship
+        
+        did_split = False
+        if splittable_ship: # if a ship can be split
+            decision = "" # init player decision
+            while decision.upper() not in ("Y", "N", "YES", "NO"): # loop until player makes up their damn mind
+                clearAndPass() # looks nicer than having terminal text go on downward forever
+                player.printStrikeBoard(opponent) # Print the player's strike board
+                print() # Print just a new line for formatting
+                player.printBoard(opponent) # Print the player's board
+                print(f"\nPlayer {player.number}'s turn!") # Print which player's turn it is
+                print(f"Ouch! Looks like one of your ships at {player.last_enemy_shot} got hit for the first time.")
+                decision = input("Would you like to break off the hit segment and move the rest of the ship pieces around as a new ship? This will cost a turn. (y/n): ")
+            if decision.upper() not in ("Y", "YES"): # if the player didn't choose yes
+                splittable_ship.can_split = False # make sure the hit ship can no longer be split
+            else: # if the decision was yes
+                new_ship_size = splittable_ship.get_split_size() # get the size of the new ship broken off from original
+                result = place_split_ship(player, opponent, player.last_enemy_shot, ship, new_ship_size) # let player place the ship
+                if result is not None: # if the player didn't cancel placement
+                    did_split = True
+                    splittable_ship.abandon() # remove all segments except the hit one from the ship to be split and mark it as destroyed
+                    player.ships.append(result) # add the new ship to the player's ships array
+                splittable_ship.can_split = False # mark the ship, whether it was split or not, as no longer splittable
+                clearAndPass() # clear terminal
+                player.printStrikeBoard(opponent) # Print the player's strike board
+                print() # Print just a new line for formatting
+                player.printBoard(opponent) # Print the player's board
+                print(f"\nPlayer {player.number}'s turn!") # Print which player's turn it is
 
-    if did_split: # if the player split, their turn is done
+        if did_split: # if the player split, their turn is done
+            input("Press Enter and pass to the next player...\n") # Print a continue game line to the console
+            clearAndPass() # Clear the console for the next player's turn
+            input("Next player press enter to continue") # Print a continue game line to the console
+            return
+        # (TEAM2 - JAKE) End code
+
+                
+
+        enemy_ship_locations = opponent.getShipLocations() # Determine the ship locations of the other player
+
+        while True: # Perform a while loop to avoid duplicate shots
+            shot = shootShip(opponent) # Allow the player to choose a coordinate to shoot
+            if shot not in player.strike_attempts: # If the shot has not already been taken
+                break # Break out of the loop
+            print("Shot already taken.\n") # Notify player that the shot was a duplicate
+        player.last_strike_was_hit = checkHit(shot, opponent) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
+        if player.last_strike_was_hit: # (TEAM1 - ALEX) Updates last hits if a shot hits, otherwise still hits
+            player.last_hits.append(shot)
+            
+        #(TEAM1 - ALEX)
+        #ADd Elif logic for when a ship is sunk, then empty the player.last_hits list
+        
+        
+        player.strike_attempts.append(shot) # Add the shot taken to the player's strike attempts
+
         input("Press Enter and pass to the next player...\n") # Print a continue game line to the console
         clearAndPass() # Clear the console for the next player's turn
         input("Next player press enter to continue") # Print a continue game line to the console
-        return
-    # (TEAM2 - JAKE) End code
-
-            
-
-    enemy_ship_locations = opponent.getShipLocations() # Determine the ship locations of the other player
-
-    while True: # Perform a while loop to avoid duplicate shots
-        shot = shootShip(opponent) # Allow the player to choose a coordinate to shoot
-        if shot not in player.strike_attempts: # If the shot has not already been taken
-            break # Break out of the loop
-        print("Shot already taken.\n") # Notify player that the shot was a duplicate
-    player.last_strike_was_hit = checkHit(shot, opponent) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
-    if player.last_strike_was_hit: # (TEAM1 - ALEX) Updates last hits if a shot hits, otherwise still hits
-        player.last_hits.append(shot)
-        
-    #(TEAM1 - ALEX)
-    #ADd Elif logic for when a ship is sunk, then empty the player.last_hits list
-    
-    
-    player.strike_attempts.append(shot) # Add the shot taken to the player's strike attempts
-
-    input("Press Enter and pass to the next player...\n") # Print a continue game line to the console
-    clearAndPass() # Clear the console for the next player's turn
-    input("Next player press enter to continue") # Print a continue game line to the console
-    '''Team Authored End'''
+        '''Team Authored End'''
     
 #//start Chat GPT authored
 def create_grid(x_size=10, y_size=10): #function that creates a grid filled with '.'
@@ -653,21 +672,46 @@ def main():
             # Human vs AI Control Flow
             while True:  # loop control
                 player_zero = Player(0, 'green', header, columns, rows)  # Intitializes Human Player 0: Number, color, header, columns, and rows
+                
                 ai_dif = input("Choose AI difficulty: \nChoose 'easy', 'medium' or 'hard'\n")  # Prompt user for difficulty
                 if ai_dif != 'easy' and ai_dif != 'medium' and ai_dif != 'hard':
                     print("Invalid difficulty. Try again.")
                 else:
-                    player_one = Ai(1, 'red', header, columns, rows, difficulty=ai_dif) # Initialize Ai Player 1 with difficulty
-                    print("AI difficulty set to ", player_one.difficulty)
+                    ai_player = Ai(1, 'red', header, columns, rows, difficulty=ai_dif) # Initialize Ai Player 1 with difficulty
+                    print("AI difficulty set to ", ai_player.difficulty)
                     break
                     
-            p1_confirmed_coordinates = [] #initialize p1's cords
+            p1_confirmed_coordinates = [] #initialize p1's coords
+            ai_confirmed_coordinates = [] #initialize ai's coords
+            
             numShips = goodInput() #calls goodInput and returns a valid number of ships for the game.
 
             # OBTAIN PLAYER 1 SHIP PLACEMENTS, GENERATE AI PLACEMENTS
             # KYLE AND ALEX: Working on this section. Run the current version and start debugging the shipPlacementAI Method
-            result = shipPlacementAI(numShips, player=player_zero, ai=player_one) #calls shipPlacement and returns two lists containing each players ship coordinates or None if the player decides to quit
+            result = shipPlacementAI(numShips, player=player_zero, ai=ai_player) #calls shipPlacement and returns two lists containing each players ship coordinates or None if the player decides to quit
+            
+            if result is None: #checks if the player quit
+                return #quit the game
+            p1_confirmed_coordinates, ai_confirmed_coordinates = result
+            
+            for ship_location in translateCoordinates(p1_confirmed_coordinates): # For each ship in player zero's ship placement coordinate list
+                player_zero.ships.append(Ship(ship_location)) # Add each ship to the player's ship list
 
+            for ship_location in translateCoordinates(ai_confirmed_coordinates): # For each ship in ai's ship placement coordinate list
+                ai_player.ships.append(Ship(ship_location)) # Add each ship to the ai's ship list
+
+            while(True):#runs until checkwin returns false and the game ends and breaks the loop
+
+                # Player 0 turn
+                takeTurn(player_zero, ai_player) # Player zero takes his turn. Team authored
+                if not checkWin(player_zero):  # Check if Player 0 wins
+                    break #Game is over so break the loop
+                
+                
+                takeTurn(ai_player, player_zero) # Player one takes his turn. Team authored
+                if not checkWin(ai_player):  # Check if AI wins
+                    break #Game is over so break the loop
+                    #//stop team authored
         else:
             print("Please select a valid option: Human (1) vs. AI (2)")
 
