@@ -31,7 +31,7 @@ class Ai(Player):
         self.difficulty = difficulty  # Add difficulty level for AI
 
     #Might need to add more parameters, i.e. opponents board for hard difficulty, last shot for medium difficulty
-    def shootShip(self):
+    def shootShip(self, opponent_board):
         if self.difficulty == 'easy':      # Easy difficulty (continuous random shots)
             col = columns[random.randint(0, 9)]
             row = str(random.randint(1, 10))

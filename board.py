@@ -41,6 +41,10 @@ from os import system, name #sets the system name to name
 from Ship import Ship #imports the Ship class
 from Player import Player #imports the Player class
 from Ai import Ai #imports the Ai classs
+import random
+
+str_rows = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
 
 def checkHit(shot: str, enemy: Player) -> None:
@@ -81,7 +85,7 @@ def checkHit(shot: str, enemy: Player) -> None:
     return hit 
 
 
-def shootShip(ai_shot=None) -> str: 
+def shootShip(opponent, ai=None) -> str: #If ai parameter is passed, calls ai shootship instead of going to the console
     """
         shootShip(ship_locations: list)
 
@@ -94,8 +98,8 @@ def shootShip(ai_shot=None) -> str:
             ai_shot: Optional string. The coordinate for AI to shoot. If None, prompts for human input.
     """
 
-    if ai_shot:  # If ai_shot is provided, use it
-        shot = ai_shot
+    if ai:  # If ai_shot is provided, use it
+        shot = ai.shootShip()
     else:  # Otherwise, prompt the human player
         print("Choose your coordinate to shoot!")  # Print a guiding statement to the user
         while True: # Loop to validate the input coordinate
@@ -109,7 +113,7 @@ def shootShip(ai_shot=None) -> str:
 
     
 #Gianni Louisa Authored, chatgpt assisted
-def checkWin():
+def checkWin(player): #Alex: Added player parameter to print correct player's win
     """
         checkWin()    
     
@@ -120,7 +124,7 @@ def checkWin():
     """
 
     # Check if all ships of player_zero are destroyed
-    if all(ship.destroyed for ship in player_zero.ships):#for every ship in player_zero's ships, check if they are true for destroyed
+    if all(ship.destroyed for ship in player.ships):#for every ship in player_zero's ships, check if they are true for destroyed
         print("======================================")#print-out
         print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
         print("======================================")#print-out
@@ -132,7 +136,7 @@ def checkWin():
         return False  # The game ends when player 1 wins
     
     # Check if all ships of player_one are destroyed
-    if all(ship.destroyed for ship in player_one.ships):#for every ship in player_one's ships, check if they are true for destroyed
+    if all(ship.destroyed for ship in player.ships):#for every ship in player_one's ships, check if they are true for destroyed
         print("======================================") #print-out
         print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
         print("======================================")#print-out
@@ -146,14 +150,14 @@ def checkWin():
     return True  # The game continues if neither player has won yet
 
 
-def printFinalBoards():
+def printFinalBoards(player0, player1):
     """Prints the final boards for each player after the game is over."""
     print("player 0's board") #print-out
-    player_zero.printStrikeBoard(player_one) #prints player_zero's strike board
-    player_zero.printBoard(player_one)  #prints player_zero's board
+    player0.printStrikeBoard(player1) #prints player_zero's strike board
+    player0.printBoard(player1)  #prints player_zero's board
     print("\nplayer 1's board\n ") #print-out
-    player_one.printStrikeBoard(player_zero) #prints player_one's strike board
-    player_one.printBoard(player_zero) #prints player_one's board
+    player1.printStrikeBoard(player0) #prints player_one's strike board
+    player1.printBoard(player0) #prints player_one's board
 
 # (TEAM2 - JAKE)
 def grid_coord_to_board_string(x: int, y: int) -> str:
@@ -293,8 +297,7 @@ def takeTurn(player: Player, opponent: Player) -> None:
             player: a Player instance whose turn it is
     """
 
-    enemy = player_one if player.number == 0 else player_zero # Determine the other player
-    player.printStrikeBoard(enemy) # Print the player's strike board
+    player.printStrikeBoard(opponent) # Print the player's strike board
     print() # Print just a new line for formatting
     player.printBoard(opponent) # Print the player's board
     print(f"\nPlayer {player.number}'s turn!") # Print which player's turn it is
@@ -311,8 +314,7 @@ def takeTurn(player: Player, opponent: Player) -> None:
         decision = "" # init player decision
         while decision.upper() not in ("Y", "N", "YES", "NO"): # loop until player makes up their damn mind
             clearAndPass() # looks nicer than having terminal text go on downward forever
-            enemy = player_one if player.number == 0 else player_zero # Determine the other player
-            player.printStrikeBoard(enemy) # Print the player's strike board
+            player.printStrikeBoard(opponent) # Print the player's strike board
             print() # Print just a new line for formatting
             player.printBoard(opponent) # Print the player's board
             print(f"\nPlayer {player.number}'s turn!") # Print which player's turn it is
@@ -322,14 +324,14 @@ def takeTurn(player: Player, opponent: Player) -> None:
             splittable_ship.can_split = False # make sure the hit ship can no longer be split
         else: # if the decision was yes
             new_ship_size = splittable_ship.get_split_size() # get the size of the new ship broken off from original
-            result = place_split_ship(player, enemy, player.last_enemy_shot, ship, new_ship_size) # let player place the ship
+            result = place_split_ship(player, opponent, player.last_enemy_shot, ship, new_ship_size) # let player place the ship
             if result is not None: # if the player didn't cancel placement
                 did_split = True
                 splittable_ship.abandon() # remove all segments except the hit one from the ship to be split and mark it as destroyed
                 player.ships.append(result) # add the new ship to the player's ships array
             splittable_ship.can_split = False # mark the ship, whether it was split or not, as no longer splittable
             clearAndPass() # clear terminal
-            player.printStrikeBoard(enemy) # Print the player's strike board
+            player.printStrikeBoard(opponent) # Print the player's strike board
             print() # Print just a new line for formatting
             player.printBoard(opponent) # Print the player's board
             print(f"\nPlayer {player.number}'s turn!") # Print which player's turn it is
@@ -343,14 +345,14 @@ def takeTurn(player: Player, opponent: Player) -> None:
 
             
 
-    enemy_ship_locations = enemy.getShipLocations() # Determine the ship locations of the other player
+    enemy_ship_locations = opponent.getShipLocations() # Determine the ship locations of the other player
 
     while True: # Perform a while loop to avoid duplicate shots
         shot = shootShip() # Allow the player to choose a coordinate to shoot
         if shot not in player.strike_attempts: # If the shot has not already been taken
             break # Break out of the loop
         print("Shot already taken.\n") # Notify player that the shot was a duplicate
-    player.last_strike_was_hit = checkHit(shot, enemy) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
+    player.last_strike_was_hit = checkHit(shot, opponent) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
     player.strike_attempts.append(shot) # Add the shot taken to the player's strike attempts
 
     input("Press Enter and pass to the next player...\n") # Print a continue game line to the console
@@ -605,9 +607,7 @@ def clearAndPass():
 # Authored by original team, adjusted to support AI opponents by Drew Meyer
 def main():
     # Drew : Human vs AI Control Flow
-    columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'] # Defining the column letters to be used for the cordinates
     rows = range(1, 11) # Range of rows that should be used for the board. In this case 11 rows, 1 for each number 1-10 and 1 for the header.
-    str_rows = ['1', '2', '3', '4', '5', '6', '7', '8', '9', "10"] # Defining the number of rows of the board for easy string operations. Team authored
     header = '    ' + ' '.join(columns) # Defining the header of the board. # ChatGPT Assisted
     
     while True:
@@ -636,10 +636,10 @@ def main():
 
                 # Player 0 turn
                 takeTurn(player_zero, player_one) # Player zero takes his turn. Team authored
-                if not checkWin():  # Check if Player 0 wins
+                if not checkWin(player_zero):  # Check if Player 0 wins
                     break #Game is over so break the loop
                 takeTurn(player_one, player_zero) # Player one takes his turn. Team authored
-                if not checkWin():  # Check if Player 1 wins
+                if not checkWin(player_one):  # Check if Player 1 wins
                     break #Game is over so break the loop
                     #//stop team authored
         elif int(if_ai) == 2: 
@@ -650,7 +650,7 @@ def main():
                 if ai_dif != 'easy' and ai_dif != 'medium' and ai_dif != 'hard':
                     print("Invalid difficulty. Try again.")
                 else:
-                    player_one = Ai(1, 'red', header, columns, rows, difficulty=ai_dif) # Initialize Ai Player 1 with difficulty easy
+                    player_one = Ai(1, 'red', header, columns, rows, difficulty=ai_dif) # Initialize Ai Player 1 with difficulty
                     print("AI difficulty set to ", player_one.difficulty)
                     break
                     
