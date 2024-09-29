@@ -99,7 +99,7 @@ def shootShip(opponent, ai=None) -> str: #If ai parameter is passed, calls ai sh
     """
 
     if ai:  # If ai_shot is provided, use it
-        shot = ai.shootShip()
+        shot = ai.shootShip(opponent)
     else:  # Otherwise, prompt the human player
         print("Choose your coordinate to shoot!")  # Print a guiding statement to the user
         while True: # Loop to validate the input coordinate
@@ -348,7 +348,7 @@ def takeTurn(player: Player, opponent: Player) -> None:
     enemy_ship_locations = opponent.getShipLocations() # Determine the ship locations of the other player
 
     while True: # Perform a while loop to avoid duplicate shots
-        shot = shootShip() # Allow the player to choose a coordinate to shoot
+        shot = shootShip(opponent) # Allow the player to choose a coordinate to shoot
         if shot not in player.strike_attempts: # If the shot has not already been taken
             break # Break out of the loop
         print("Shot already taken.\n") # Notify player that the shot was a duplicate

@@ -31,15 +31,28 @@ class Ai(Player):
         self.difficulty = difficulty  # Add difficulty level for AI
 
     #Might need to add more parameters, i.e. opponents board for hard difficulty, last shot for medium difficulty
-    def shootShip(self, opponent_board):
+    def shootShip(self, opponent):
         if self.difficulty == 'easy':      # Easy difficulty (continuous random shots)
             col = columns[random.randint(0, 9)]
             row = str(random.randint(1, 10))
-            return row + col
+            shot = row + col
+            self.strike_attempts.append(shot)
+            return shot
         elif self.difficulty == 'medium':  # Medium difficulty (random until hit, then adjacent)
-            pass
+            if self.last_strike_was_hit:
+                last_row, last_col = opponent.last_enemy_shot[0], opponent.last_enemy_shot[1:]
+                
+            else:
+                col = columns[random.randint(0, 9)]
+                row = str(random.randint(1, 10))
+                shot = row + col
+                self.strike_attempts.append(shot)
+                return shot
         elif self.difficulty == 'hard':    # Hard difficulty (knows all ship locations)
-            pass
+            for coord in opponent.getShipLocations():
+                if coord not in self.strike_attempts:
+                    self.strike_attempts.append(coord) #add coordinate to strike attempt
+                    return coord #return shot
 
     def getShipPlacements(self, size: int) -> list:
         """Function to get random placement of ships."""
