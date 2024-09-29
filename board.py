@@ -42,12 +42,13 @@ from Ship import Ship #imports the Ship class
 from Player import Player #imports the Player class
 from Ai import Ai #imports the Ai classs
 import random
+import time #for a delayed message
 
 str_rows = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
 
-def checkHit(shot: str, enemy: Player):
+def checkHit(shot: str, enemy: Player, isAi: bool):
     """
         checkHit(shot: str, enemy: PLayer)
 
@@ -67,19 +68,31 @@ def checkHit(shot: str, enemy: Player):
         if shot in enemy_ship.locations:  # Check if the shot hit one of the coordinates held in ship locations
             enemy.last_enemy_shot = shot # (TEAM2 - JAKE) if the shot was a hit, update the enemy's state to record it -- needed for moving ships
             enemy_ship.hit_segments.append(shot)  # Add the section of the ship that was hit to the Ship object's list of hit segments
-            print("\nHIT!\n")  # Print HIT to the console
+            if isAi:  
+                print("\nAI HIT!")  # Print HIT to the console
+                time.sleep(.75) #delay for user to read AI's shots
+            else: 
+                print("\nHIT!\n")  # Print HIT to the console
+                
             hit = True  # Set hit to True
 
             # Check if all segments of the enemy ship have been hit
             if sorted(enemy_ship.hit_segments) == sorted(enemy_ship.locations):
                 enemy_ship.destroyed = True  # Set the destroyed ship's bool to true to signify that it was sunk
-                print("SHIP DESTROYED!\n")  # Print that the ship was destroyed
+                if isAi:
+                    print("AI DESTROYED SHIP!\n")  # Print that the ship was destroyed
+                    time.sleep(.75) #delay for user to read AI's shots
+                else:
+                    print("SHIP DESTROYED!\n") # Print that the ship was destroyed with no delay
             break  # Break the loop after a hit
 
     if not hit:  # If no hit was detected, print MISS
+        if isAi:
+            print("\nAI: MISS!")
+            time.sleep(.75) #delay for user to read AI's shots
+        else:
+            print("\nMISS!\n")
         enemy.last_enemy_shot = None # (TEAM2 - JAKE) if the shot was not a hit, update the enemy's state to show this
-        print("\nMISS!\n")
-
     # (TEAM2 - JAKE) previously, this was not returned.
     # required for checking if the last shot made by a player was a hit (necessary for AI)
     return hit 
@@ -302,7 +315,7 @@ def takeTurn(player: Player, opponent: Player) -> None:
 
         shot = shootShip(opponent, player) # Allow the player to choose a coordinate to shoot
             
-        player.last_strike_was_hit = checkHit(shot, opponent) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
+        player.last_strike_was_hit = checkHit(shot, opponent, True) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
         
         if player.last_strike_was_hit: # (TEAM1 - ALEX) Updates last hits if a shot hits, otherwise still hits
             player.last_hits.append(shot)
@@ -313,7 +326,7 @@ def takeTurn(player: Player, opponent: Player) -> None:
         player.strike_attempts.append(shot) # Add the shot taken to the player's strike attempts
         
         clearAndPass() # Clear the console for the next player's turn
-        input("Next player press enter to continue") # Print a continue game line to the console
+
         '''Team Authored End'''
     else:  
         player.printStrikeBoard(opponent) # Print the player's strike board
@@ -358,6 +371,7 @@ def takeTurn(player: Player, opponent: Player) -> None:
         if did_split: # if the player split, their turn is done
             input("Press Enter and pass to the next player...\n") # Print a continue game line to the console
             clearAndPass() # Clear the console for the next player's turn
+
             input("Next player press enter to continue") # Print a continue game line to the console
             return
         # (TEAM2 - JAKE) End code
@@ -368,7 +382,7 @@ def takeTurn(player: Player, opponent: Player) -> None:
             if shot not in player.strike_attempts: # If the shot has not already been taken
                 break # Break out of the loop
             print("Shot already taken.\n") # Notify player that the shot was a duplicate
-        player.last_strike_was_hit = checkHit(shot, opponent) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
+        player.last_strike_was_hit = checkHit(shot, opponent, False) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
         if player.last_strike_was_hit: # (TEAM2 - ALEX) Updates last hits if a shot hits, otherwise still hits
             player.last_hits.append(shot)
             
@@ -377,10 +391,11 @@ def takeTurn(player: Player, opponent: Player) -> None:
         
         
         player.strike_attempts.append(shot) # Add the shot taken to the player's strike attempts
-
+     
         input("Press Enter and pass to the next player...\n") # Print a continue game line to the console
         clearAndPass() # Clear the console for the next player's turn
-        input("Next player press enter to continue") # Print a continue game line to the console
+        if not isinstance(opponent, Ai):
+            input("Next player press enter to continue") # Print a continue game line to the console
     '''Team Authored End'''
 
 #//start Chat GPT authored
