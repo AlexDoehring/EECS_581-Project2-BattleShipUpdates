@@ -33,10 +33,13 @@ class Ai(Player):
     #Might need to add more parameters, i.e. opponents board for hard difficulty, last shot for medium difficulty
     def shootShip(self, opponent):
         if self.difficulty == 'easy':      # Easy difficulty (continuous random shots)
-            col = columns[random.randint(0, 9)]
-            row = str(random.randint(1, 10))
-            shot = row + col
-            self.strike_attempts.append(shot)
+            while True:
+                col = columns[random.randint(0, 9)]
+                row = str(random.randint(1, 10))
+                shot = row + col
+                if shot not in self.strike_attempts:
+                    self.strike_attempts.append(shot)
+                    break
             return shot
         elif self.difficulty == 'medium':  # Medium difficulty (random until hit, then adjacent)
             if self.last_hits: #If a shit was hit recently, shoot orthoganally
@@ -67,8 +70,10 @@ class Ai(Player):
                     for shot in possible_shots:
                         if shot in self.strike_attempts:
                             possible_shots.remove(shot)
-                            
-                    return random.choice(possible_shots)
+                    
+                    shot = random.choice(possible_shots)
+                    self.strike_attempts.append(shot)
+                    return shot
                 else:  # If multiple hits, only target the long-wise edges
                     possible_shots = []
 
@@ -105,8 +110,9 @@ class Ai(Player):
                         if shot in self.strike_attempts:
                             possible_shots.remove(shot)
 
-                    return random.choice(possible_shots)
-                
+                    shot = random.choice(possible_shots)
+                    self.strike_attempts.append(shot)
+                    return shot       
             else:
                 col = columns[random.randint(0, 9)]
                 row = str(random.randint(1, 10))
