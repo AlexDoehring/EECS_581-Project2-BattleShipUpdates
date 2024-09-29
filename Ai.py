@@ -69,17 +69,42 @@ class Ai(Player):
                             possible_shots.remove(shot)
                             
                     return random.choice(possible_shots)
-                else:
-                    last_col = self.last_hits[0][0]
-                    last_row = self.last_hits[0][1:]
-                    all(s[0] == last_row for s in self.last_hits)
+                else:  # If multiple hits, only target the long-wise edges
                     possible_shots = []
-                    
+
+                    # Check if the hits are in the same row (horizontal line)
+                    same_row = all(s[1:] == self.last_hits[0][1:] for s in self.last_hits)
+                    if same_row:
+                        row = self.last_hits[0][1:]
+                        # Add leftmost shot
+                        first_col = self.last_hits[0][0]
+                        first_col_idx = columns.index(first_col)
+                        if first_col_idx > 0:
+                            possible_shots.append(f"{columns[first_col_idx - 1]}{row}")
+
+                        # Add rightmost shot
+                        last_col = self.last_hits[-1][0]
+                        last_col_idx = columns.index(last_col)
+                        if last_col_idx < len(columns) - 1:
+                            possible_shots.append(f"{columns[last_col_idx + 1]}{row}")
+
+                    else:  # Hits are in the same column (vertical line)
+                        col = self.last_hits[0][0]
+                        # Add topmost shot
+                        first_row = int(self.last_hits[0][1:])
+                        if first_row > 1:
+                            possible_shots.append(f"{col}{first_row - 1}")
+
+                        # Add bottommost shot
+                        last_row = int(self.last_hits[-1][1:])
+                        if last_row < 10:
+                            possible_shots.append(f"{col}{last_row + 1}")
+
                     # Filter out the shots already attempted
                     for shot in possible_shots:
                         if shot in self.strike_attempts:
                             possible_shots.remove(shot)
-                            
+
                     return random.choice(possible_shots)
                 
             else:
