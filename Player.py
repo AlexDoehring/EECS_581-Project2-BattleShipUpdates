@@ -71,10 +71,16 @@ class Player:
             - desc:
             Used to keep track of the last shot an enemy made against a player. If it's 'None', there was no shot or it was a miss.
             Successful shots are stored as coordinate strings, eg "B4".
+            
+            (Team1 - Alex)
+            last_hit
+            -list of str: initialized to empty
+            -desc:
+            used to keep track of what the last hit shots were, primarily used for AI
         """
         self.last_strike_was_hit = False # Was the last strike this player made a hit?
         self.last_enemy_shot = None # Either 'None' (The enemy missed or the game just started) or a coordinate of the last hit ship segment
-        self.last_hit = None # Either 'None (Game just started or ship was just sunk) or coordinate of last hit 
+        self.last_hits = [] # Either empty (Game just started or ship was just sunk) or list of coordinates of last hit ship
 
     #Gianni and Connor authored
     def convertTextToColor(self, text: str, color: str) -> str:

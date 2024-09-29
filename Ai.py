@@ -39,26 +39,48 @@ class Ai(Player):
             self.strike_attempts.append(shot)
             return shot
         elif self.difficulty == 'medium':  # Medium difficulty (random until hit, then adjacent)
-            if self.last_strike_was_hit:
-                last_row, last_col = self.last_hit[0], self.last_hit[1:]
-                possible_shots = []
-            
-                # Check adjacent cells (up, down, left, right)
-                if last_row > 1:  # Up
-                    possible_shots.append((row - 1, col))
-                if last_row < len(self.rows):  # Down
-                    possible_shots.append((row + 1, col))
-                if last_col != 'A':  # Left
-                    possible_shots.append((row, chr(ord(col) - 1)))
-                if last_col != 'J':  # Right
-                    possible_shots.append((row, chr(ord(col) + 1)))
-                
-                # Filter out the shots already attempted
-                for shot in possible_shots:
-                    if shot in self.strike_attempts:
-                        possible_shots.remove(shot)
-                        
-                return random.choice(possible_shots)
+            if self.last_hits: #If a shit was hit recently, shoot orthoganally
+                if len(self.last_hits) == 1: #if just one ship, shoot randomly above or below
+                    last_col = self.last_hits[0][0]
+                    last_row = int(self.last_hits[0][1:])
+                    possible_shots = []
+                    
+                    # Add above coordinate
+                    if last_row > 1:
+                        possible_shots.append(f"{last_col}{last_row - 1}")
+
+                    # Add below coordinate
+                    if last_row < 10:
+                        possible_shots.append(f"{last_col}{last_row + 1}")
+
+                    # Add left coordinate
+                    col_idx = columns.index(last_col)
+                    if col_idx > 0:
+                        possible_shots.append(f"{columns[col_idx - 1]}{last_row}")
+
+                    # Add right coordinate
+                    if col_idx < len(columns) - 1:
+                        possible_shots.append(f"{columns[col_idx + 1]}{last_row}")
+                    
+                    
+                    # Filter out the shots already attempted
+                    for shot in possible_shots:
+                        if shot in self.strike_attempts:
+                            possible_shots.remove(shot)
+                            
+                    return random.choice(possible_shots)
+                else:
+                    last_col = self.last_hits[0][0]
+                    last_row = self.last_hits[0][1:]
+                    all(s[0] == last_row for s in self.last_hits)
+                    possible_shots = []
+                    
+                    # Filter out the shots already attempted
+                    for shot in possible_shots:
+                        if shot in self.strike_attempts:
+                            possible_shots.remove(shot)
+                            
+                    return random.choice(possible_shots)
                 
             else:
                 col = columns[random.randint(0, 9)]
