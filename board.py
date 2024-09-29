@@ -47,7 +47,7 @@ str_rows = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 
 
-def checkHit(shot: str, enemy: Player) -> None:
+def checkHit(shot: str, enemy: Player):
     """
         checkHit(shot: str, enemy: PLayer)
 
@@ -353,6 +353,7 @@ def takeTurn(player: Player, opponent: Player) -> None:
             break # Break out of the loop
         print("Shot already taken.\n") # Notify player that the shot was a duplicate
     player.last_strike_was_hit = checkHit(shot, opponent) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
+    player.last_hit = shot if player.last_strike_was_hit else player.last_hit # (TEAM1 - ALEX) Updates the last hit if a shot hits, otherwise still hits
     player.strike_attempts.append(shot) # Add the shot taken to the player's strike attempts
 
     input("Press Enter and pass to the next player...\n") # Print a continue game line to the console

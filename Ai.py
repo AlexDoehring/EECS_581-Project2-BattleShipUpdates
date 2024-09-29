@@ -40,7 +40,25 @@ class Ai(Player):
             return shot
         elif self.difficulty == 'medium':  # Medium difficulty (random until hit, then adjacent)
             if self.last_strike_was_hit:
-                last_row, last_col = opponent.last_enemy_shot[0], opponent.last_enemy_shot[1:]
+                last_row, last_col = self.last_hit[0], self.last_hit[1:]
+                possible_shots = []
+            
+                # Check adjacent cells (up, down, left, right)
+                if last_row > 1:  # Up
+                    possible_shots.append((row - 1, col))
+                if last_row < len(self.rows):  # Down
+                    possible_shots.append((row + 1, col))
+                if last_col != 'A':  # Left
+                    possible_shots.append((row, chr(ord(col) - 1)))
+                if last_col != 'J':  # Right
+                    possible_shots.append((row, chr(ord(col) + 1)))
+                
+                # Filter out the shots already attempted
+                for shot in possible_shots:
+                    if shot in self.strike_attempts:
+                        possible_shots.remove(shot)
+                        
+                return random.choice(possible_shots)
                 
             else:
                 col = columns[random.randint(0, 9)]
