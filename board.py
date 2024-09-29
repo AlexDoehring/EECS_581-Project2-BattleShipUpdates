@@ -104,7 +104,7 @@ def shootShip(opponent, ai=None) -> str: #If ai parameter is passed, calls ai sh
     else:  # Otherwise, prompt the human player
         print("Choose your coordinate to shoot!")  # Print a guiding statement to the user
         while True: # Loop to validate the input coordinate
-            shot = input("Coordinate: ").upper() # Player inputs coordinate
+            shot = input("Coordinates (i.e. A1, B5, C4...): ").upper() # Player inputs coordinate
             if 2 <= len(shot) <= 3 and shot[0] in columns and shot[1] in str_rows: # If the coordinate is 2 or 3 characters long and the first character is a valid column and the second character is a valid row
                 if len(shot) == 3 and (shot[1] + shot[2] not in str_rows): # If the coordinate is three characters long and the two characters at the end aren't in the list of valid rows
                     continue # Stay in the loop
@@ -309,8 +309,7 @@ def takeTurn(player: Player, opponent: Player) -> None:
             
         #(TEAM1 - ALEX)
         #ADd Elif logic for when a ship is sunk, then empty the player.last_hits list
-        
-        
+
         player.strike_attempts.append(shot) # Add the shot taken to the player's strike attempts
         
         clearAndPass() # Clear the console for the next player's turn
@@ -494,6 +493,7 @@ def move_line(grid, size, p1_selection): #moves and places a line of a given siz
         else: #invalid input, error
             print("Invalid move! Please use W, A, S, D, R, C, or Q.")
 #//stop Chat GPT authored
+
 def translateCoordinates(ship_tuples: list) -> list:
     """
         translateCoordinates(ship_tuples)
@@ -695,7 +695,7 @@ def main():
             for ship_location in translateCoordinates(p1_confirmed_coordinates): # For each ship in player zero's ship placement coordinate list
                 player_zero.ships.append(Ship(ship_location)) # Add each ship to the player's ship list
 
-            for ship_location in translateCoordinates(ai_confirmed_coordinates): # For each ship in ai's ship placement coordinate list
+            for ship_location in ai_confirmed_coordinates: # For each ship in ai's ship placement coordinate list
                 ai_player.ships.append(Ship(ship_location)) # Add each ship to the ai's ship list
 
             while(True):#runs until checkwin returns false and the game ends and breaks the loop
