@@ -36,7 +36,7 @@ class Ai(Player):
             while True:
                 col = columns[random.randint(0, 9)] #Grab random column
                 row = str(random.randint(1, 10)) #Grab random row
-                shot = row + col #append both to make shot coordinate
+                shot = col + row #append both to make shot coordinate
                 if shot not in self.strike_attempts: #if the shot has not already been shot
                     self.strike_attempts.append(shot) #append to shot attempts
                     break #break out of the loop
@@ -116,7 +116,7 @@ class Ai(Player):
             else:
                 col = columns[random.randint(0, 9)]
                 row = str(random.randint(1, 10))
-                shot = row + col
+                shot = col + row
                 self.strike_attempts.append(shot)
                 return shot
         elif self.difficulty == 'hard':    # Hard difficulty (knows all ship locations)
