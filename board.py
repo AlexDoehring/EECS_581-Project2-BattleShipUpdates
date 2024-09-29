@@ -137,10 +137,10 @@ def checkWin(player, opponent, turn): #Alex: Added player parameter to print cor
         Returns False if game is won and should end.
     """
     if not isinstance(player, Ai) and not isinstance(opponent, Ai):
-        # Check if all ships of player_zero are destroyed
+       
         if turn == 0:
         # Check if all ships of player_one are destroyed
-            if all(ship.destroyed for ship in player.ships):#for every ship in player_one's ships, check if they are true for destroyed
+            if all(ship.destroyed for ship in opponent.ships):#for every ship in player_one's ships, check if they are true for destroyed
                 print("======================================") #print-out
                 print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
                 print("======================================")#print-out
@@ -150,7 +150,18 @@ def checkWin(player, opponent, turn): #Alex: Added player parameter to print cor
                 print("======================================\n")#print-out
                 printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
                 return False  # The game ends when player 0 wins
+            if all(ship.destroyed for ship in player.ships):#for every ship in player_zero's ships, check if they are true for destroyed
+                print("======================================")#print-out
+                print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
+                print("======================================")#print-out
+                print("      🚢💥 Player 1 Wins! 💥🚢")#print-out
+                print("======================================")#print-out
+                print("    All enemy ships have been sunk!")#print-out
+                print("======================================\n")#print-out
+                printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
+                return False  # The game ends when player 1 wins      
         else: 
+        # Check if all ships of player_zero are destroyed
             if all(ship.destroyed for ship in opponent.ships):#for every ship in player_zero's ships, check if they are true for destroyed
                 print("======================================")#print-out
                 print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
@@ -161,10 +172,22 @@ def checkWin(player, opponent, turn): #Alex: Added player parameter to print cor
                 print("======================================\n")#print-out
                 printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
                 return False  # The game ends when player 1 wins
+            
+            if all(ship.destroyed for ship in player.ships):#for every ship in player_'s ships, check if they are true for destroyed
+                print("======================================")#print-out
+                print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
+                print("======================================")#print-out
+                print("      🚢💥 Player 0 Wins! 💥🚢")#print-out
+                print("======================================")#print-out
+                print("    All enemy ships have been sunk!")#print-out
+                print("======================================\n")#print-out
+                printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
+                return False  # The game ends when player 1 wins
+    
     else:
         if turn == 0:
-                       
-            if all(ship.destroyed for ship in opponent.ships): #for every ship in player_zero's ships, check if they are true for destroyed
+        #Check if all of AI's ships are destroyed          
+            if all(ship.destroyed for ship in opponent.ships): #for every ship in AI's ships, check if they are true for destroyed
                 print("======================================") #print-out
                 print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
                 print("======================================")#print-out
@@ -174,8 +197,8 @@ def checkWin(player, opponent, turn): #Alex: Added player parameter to print cor
                 print("======================================\n")#print-out
                 printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
                 return False  # The game ends when player 0 wins
-        else:
-            if all(ship.destroyed for ship in opponent.ships):#for every ship in player_zero's ships, check if they are true for destroyed
+            
+            if all(ship.destroyed for ship in player.ships):#for every ship in player's ships, check if they are true for destroyed
                 print("======================================")#print-out
                 print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
                 print("======================================")#print-out
@@ -186,17 +209,59 @@ def checkWin(player, opponent, turn): #Alex: Added player parameter to print cor
                 printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
                 return False  # The game ends when player 1 wins
     
+        else:
+        #Check if all of Players ships are destroyed
+            if all(ship.destroyed for ship in opponent.ships):#for every ship in player's ships, check if they are true for destroyed
+                print("======================================")#print-out
+                print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
+                print("======================================")#print-out
+                print("      🚢💥 AI Wins! 💥🚢")#print-out
+                print("======================================")#print-out
+                print("    All enemy ships have been sunk!")#print-out
+                print("======================================\n")#print-out
+                printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
+                return False  # The game ends when player 1 wins
+            
+            if all(ship.destroyed for ship in player.ships):#for every ship in player's ships, check if they are true for destroyed
+                print("======================================")#print-out
+                print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
+                print("======================================")#print-out
+                print("      🚢💥 Player Wins! 💥🚢")#print-out
+                print("======================================")#print-out
+                print("    All enemy ships have been sunk!")#print-out
+                print("======================================\n")#print-out
+                printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
+                return False  # The game ends when player 1 wins
+    
+    
     return True  # The game continues if neither player has won yet
 
 
 def printFinalBoards(player0, player1):
     """Prints the final boards for each player after the game is over."""
-    print("player 0's board") #print-out
-    player0.printStrikeBoard(player1) #prints player_zero's strike board
-    player0.printBoard(player1)  #prints player_zero's board
-    print("\nplayer 1's board\n ") #print-out
-    player1.printStrikeBoard(player0) #prints player_one's strike board
-    player1.printBoard(player0) #prints player_one's board
+    if isinstance(player0, Ai):
+        print("AI's board")
+        player0.printStrikeBoard(player1) #prints player_zero's strike board
+        player0.printBoard(player1)  #prints player_zero's board
+        print("Player's Board")
+        player1.printStrikeBoard(player0) #prints player_one's strike board
+        player1.printBoard(player0) #prints player_one's board
+    elif isinstance(player1, Ai):  
+        print("Player's board")
+        player0.printStrikeBoard(player0) #prints player_zero's strike board
+        player0.printBoard(player0)  #prints player_zero's board
+        print("AI's Board")
+        player1.printStrikeBoard(player1) #prints player_one's strike board
+        player1.printBoard(player1) #prints player_one's board
+    else: 
+        print("Player 0's board")
+        player0.printStrikeBoard(player0) #prints player_zero's strike board
+        player0.printBoard(player0)  #prints player_zero's board
+        print("Player 1's Board")
+        player1.printStrikeBoard(player1) #prints player_one's strike board
+        player1.printBoard(player1) #prints player_one's board
+        
+    
 
 # (TEAM2 - JAKE)
 def grid_coord_to_board_string(x: int, y: int) -> str:
