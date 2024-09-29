@@ -36,7 +36,7 @@ class Ai(Player):
             while True:
                 col = columns[random.randint(0, 9)] #Grab random column
                 row = str(random.randint(1, 10)) #Grab random row
-                shot = row + col #append both to make shot coordinate
+                shot = col + row #append both to make shot coordinate
                 if shot not in self.strike_attempts: #if the shot has not already been shot
                     self.strike_attempts.append(shot) #append to shot attempts
                     break #break out of the loop
