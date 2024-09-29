@@ -106,19 +106,20 @@ class Ai(Player):
                             possible_shots.append(f"{col}{last_row + 1}")
 
                     # Filter out the shots already attempted
-                    for shot in possible_shots:
-                        if shot in self.strike_attempts:
-                            possible_shots.remove(shot)
+                    possible_shots = [shot for shot in possible_shots if shot not in self.strike_attempts]
 
                     shot = random.choice(possible_shots)
                     self.strike_attempts.append(shot)
                     return shot       
             else:
-                col = columns[random.randint(0, 9)]
-                row = str(random.randint(1, 10))
-                shot = col + row
-                self.strike_attempts.append(shot)
-                return shot
+                while True:
+                    col = columns[random.randint(0, 9)] #Grab random column
+                    row = str(random.randint(1, 10)) #Grab random row
+                    shot = col + row #append both to make shot coordinate
+                    if shot not in self.strike_attempts: #if the shot has not already been shot
+                        self.strike_attempts.append(shot) #append to shot attempts
+                        break #break out of the loop
+                return shot #return the shot
         elif self.difficulty == 'hard':    # Hard difficulty (knows all ship locations)
             for coord in opponent.getShipLocations():
                 if coord not in self.strike_attempts:
