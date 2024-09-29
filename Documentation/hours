@@ -3,11 +3,14 @@ Drew
 2024-9-28
 (0.5) 5:00-5:30 PM
 Reviewed original group's project and got a good feel of how the game works. Essentially reviewing the existing code
+
 (3) 5:30-8:30 PM
 Adjusted the main game flow to allow the player to choose an AI opponent. 
 After choosing the opponent, the player chooses the difficulty of the AI.
 Once the AI difficulty has been specified, the player chooses their ship placement. Afterward the AI should randomly generate its own ship placements.
 
+(0.5) 2:30-3:00 PM
+Bug fixing implementation of control flow
 
 Jake
 ====

@@ -1,0 +1,10 @@
+1) Make sure you can't replace the ship onto a spot that's already hit - GOOD
+2) Make sure you can't place the ship on another ship - GOOD
+3) Place the ship out of range - GOOD
+4) Can't replace ship of size 1 -GOOD
+5) Make sure you cant replace same ship twice - GOOD
+6) Make sure a ship can still get to any open spot, regardless of hit spots "blocking" it - GOOD
+7) Make sure the location of the hit doesn't impact the size/ shape of replacement ship - GOOD
+8) Handling for when there are no places for the  ship to be placed - GOOD
+9) Make sure you can't rotate a ship off the board -GOOD
+10) Can only move ship after the first time it has been hit - GOOD
