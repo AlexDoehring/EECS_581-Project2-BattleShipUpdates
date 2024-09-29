@@ -138,7 +138,7 @@ def checkWin(player, opponent): #Alex: Added player parameter to print correct p
     """
 
     # Check if all ships of player_zero are destroyed
-    if all(ship.destroyed for ship in player.ships):#for every ship in player_zero's ships, check if they are true for destroyed
+    if all(ship.destroyed for ship in opponent.ships):#for every ship in player_zero's ships, check if they are true for destroyed
         print("======================================")#print-out
         print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
         print("======================================")#print-out
@@ -150,7 +150,7 @@ def checkWin(player, opponent): #Alex: Added player parameter to print correct p
         return False  # The game ends when player 1 wins
     
     # Check if all ships of player_one are destroyed
-    if all(ship.destroyed for ship in player.ships):#for every ship in player_one's ships, check if they are true for destroyed
+    if all(ship.destroyed for ship in opponent.ships):#for every ship in player_one's ships, check if they are true for destroyed
         print("======================================") #print-out
         print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
         print("======================================")#print-out
@@ -648,83 +648,84 @@ def main():
     header = '    ' + ' '.join(columns) # Defining the header of the board. # ChatGPT Assisted
     
     while True:
-        if_ai = input("Please choose a human (1) or AI opponent (2): ")
-        if int(if_ai) == 1:  # input if_ai, 1 = human vs human, 2 = human vs ai
-            # Human vs Human Control Flow
-            player_zero = Player(0, 'green', header, columns, rows) # Intitializes Human Player 0: Number, color, header, columns, and rows
-            player_one = Player(1, 'blue', header, columns, rows)   # Intitializes Human Player 1: Number, color, header, columns, and rows
+        if_ai = input("Please choose a human (1) or AI opponent (2): ") 
+        if int(if_ai) == 1 or int(if_ai) == 2:
+            break
+    
+    if int(if_ai) == 1:  # input if_ai, 1 = human vs human, 2 = human vs ai
+        # Human vs Human Control Flow
+        player_zero = Player(0, 'green', header, columns, rows) # Intitializes Human Player 0: Number, color, header, columns, and rows
+        player_one = Player(1, 'blue', header, columns, rows)   # Intitializes Human Player 1: Number, color, header, columns, and rows
 
-            p1_confirmed_coordinates = [] #initialize p1's cords
-            p2_confirmed_coordinates = [] #initialize p2's cords
-            numShips = goodInput() #calls goodInput and returns a valid number of ships for the game.
+        p1_confirmed_coordinates = [] #initialize p1's cords
+        p2_confirmed_coordinates = [] #initialize p2's cords
+        numShips = goodInput() #calls goodInput and returns a valid number of ships for the game.
+        
+        result = shipPlacement(numShips) #calls shipPlacement and returns two lists containing each players ship coordinates or None if the player decides to quit
+        if result is None: #checks if the player quit
+            return #quit the game
+        p1_confirmed_coordinates, p2_confirmed_coordinates = result
+        
+        for ship_location in translateCoordinates(p1_confirmed_coordinates): # For each ship in player zero's ship placement coordinate list
+            player_zero.ships.append(Ship(ship_location)) # Add each ship to the player's ship list
+
+        for ship_location in translateCoordinates(p2_confirmed_coordinates): # For each ship in player zero's ship placement coordinate list
+            player_one.ships.append(Ship(ship_location)) # Add each ship to the player's ship list
+
+        while(True):#runs until checkwin returns false and the game ends and breaks the loop
+
+            # Player 0 turn
+            takeTurn(player_zero, player_one) # Player zero takes his turn. Team authored
+            if not checkWin(player_zero, player_one):  # Check if Player 0 wins
+                break #Game is over so break the loop
+            takeTurn(player_one, player_zero) # Player one takes his turn. Team authored
+            if not checkWin(player_one, player_zero):  # Check if Player 1 wins
+                break #Game is over so break the loop
+                #//stop team authored
+    elif int(if_ai) == 2: 
+        # Human vs AI Control Flow
+        while True:  # loop control
+            player_zero = Player(0, 'green', header, columns, rows)  # Intitializes Human Player 0: Number, color, header, columns, and rows
             
-            result = shipPlacement(numShips) #calls shipPlacement and returns two lists containing each players ship coordinates or None if the player decides to quit
-            if result is None: #checks if the player quit
-                return #quit the game
-            p1_confirmed_coordinates, p2_confirmed_coordinates = result
-            
-            for ship_location in translateCoordinates(p1_confirmed_coordinates): # For each ship in player zero's ship placement coordinate list
-                player_zero.ships.append(Ship(ship_location)) # Add each ship to the player's ship list
-
-            for ship_location in translateCoordinates(p2_confirmed_coordinates): # For each ship in player zero's ship placement coordinate list
-                player_one.ships.append(Ship(ship_location)) # Add each ship to the player's ship list
-
-            while(True):#runs until checkwin returns false and the game ends and breaks the loop
-
-                # Player 0 turn
-                takeTurn(player_zero, player_one) # Player zero takes his turn. Team authored
-                if not checkWin(player_zero, player_one):  # Check if Player 0 wins
-                    break #Game is over so break the loop
-                takeTurn(player_one, player_zero) # Player one takes his turn. Team authored
-                if not checkWin(player_one, player_zero):  # Check if Player 1 wins
-                    break #Game is over so break the loop
-                    #//stop team authored
-        elif int(if_ai) == 2: 
-            # Human vs AI Control Flow
-            while True:  # loop control
-                player_zero = Player(0, 'green', header, columns, rows)  # Intitializes Human Player 0: Number, color, header, columns, and rows
+            ai_dif = input("Choose AI difficulty: \nChoose 'easy', 'medium' or 'hard'\n")  # Prompt user for difficulty
+            if ai_dif != 'easy' and ai_dif != 'medium' and ai_dif != 'hard':
+                print("Invalid difficulty. Try again.")
+            else:
+                ai_player = Ai(1, 'red', header, columns, rows, difficulty=ai_dif) # Initialize Ai Player 1 with difficulty
+                print("AI difficulty set to ", ai_player.difficulty)
+                break
                 
-                ai_dif = input("Choose AI difficulty: \nChoose 'easy', 'medium' or 'hard'\n")  # Prompt user for difficulty
-                if ai_dif != 'easy' and ai_dif != 'medium' and ai_dif != 'hard':
-                    print("Invalid difficulty. Try again.")
-                else:
-                    ai_player = Ai(1, 'red', header, columns, rows, difficulty=ai_dif) # Initialize Ai Player 1 with difficulty
-                    print("AI difficulty set to ", ai_player.difficulty)
-                    break
-                    
-            p1_confirmed_coordinates = [] #initialize p1's coords
-            ai_confirmed_coordinates = [] #initialize ai's coords
+        p1_confirmed_coordinates = [] #initialize p1's coords
+        ai_confirmed_coordinates = [] #initialize ai's coords
+        
+        numShips = goodInput() #calls goodInput and returns a valid number of ships for the game.
+
+        # OBTAIN PLAYER 1 SHIP PLACEMENTS, GENERATE AI PLACEMENTS
+        # KYLE AND ALEX: Working on this section. Run the current version and start debugging the shipPlacementAI Method
+        result = shipPlacementAI(numShips, player=player_zero, ai=ai_player) #calls shipPlacement and returns two lists containing each players ship coordinates or None if the player decides to quit
+        
+        if result is None: #checks if the player quit
+            return #quit the game
+        p1_confirmed_coordinates, ai_confirmed_coordinates = result
+        
+        for ship_location in translateCoordinates(p1_confirmed_coordinates): # For each ship in player zero's ship placement coordinate list
+            player_zero.ships.append(Ship(ship_location)) # Add each ship to the player's ship list
+
+        for ship_location in ai_confirmed_coordinates: # For each ship in ai's ship placement coordinate list
+            ai_player.ships.append(Ship(ship_location)) # Add each ship to the ai's ship list
+
+        while(True):#runs until checkwin returns false and the game ends and breaks the loop
+
+            # Player 0 turn
+            takeTurn(player_zero, ai_player) # Player zero takes his turn. Team authored
+            if not checkWin(player_zero, ai_player):  # Check if Player 0 wins
+                break #Game is over so break the loop
             
-            numShips = goodInput() #calls goodInput and returns a valid number of ships for the game.
-
-            # OBTAIN PLAYER 1 SHIP PLACEMENTS, GENERATE AI PLACEMENTS
-            # KYLE AND ALEX: Working on this section. Run the current version and start debugging the shipPlacementAI Method
-            result = shipPlacementAI(numShips, player=player_zero, ai=ai_player) #calls shipPlacement and returns two lists containing each players ship coordinates or None if the player decides to quit
             
-            if result is None: #checks if the player quit
-                return #quit the game
-            p1_confirmed_coordinates, ai_confirmed_coordinates = result
-            
-            for ship_location in translateCoordinates(p1_confirmed_coordinates): # For each ship in player zero's ship placement coordinate list
-                player_zero.ships.append(Ship(ship_location)) # Add each ship to the player's ship list
-
-            for ship_location in ai_confirmed_coordinates: # For each ship in ai's ship placement coordinate list
-                ai_player.ships.append(Ship(ship_location)) # Add each ship to the ai's ship list
-
-            while(True):#runs until checkwin returns false and the game ends and breaks the loop
-
-                # Player 0 turn
-                takeTurn(player_zero, ai_player) # Player zero takes his turn. Team authored
-                if not checkWin(player_zero, ai_player):  # Check if Player 0 wins
-                    break #Game is over so break the loop
-                
-                
-                takeTurn(ai_player, player_zero) # Player one takes his turn. Team authored
-                if not checkWin(ai_player, player_zero):  # Check if AI wins
-                    break #Game is over so break the loop
-                    #//stop team authored
-        else:
-            print("Please select a valid option: Human (1) vs. AI (2)")
+            takeTurn(ai_player, player_zero) # Player one takes his turn. Team authored
+            if not checkWin(ai_player, player_zero):  # Check if AI wins
+                break #Game is over so break the loop
+                #//stop team authored
 
 main() #runs the game
 
