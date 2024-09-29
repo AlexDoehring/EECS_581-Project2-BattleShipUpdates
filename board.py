@@ -304,11 +304,13 @@ def takeTurn(player: Player, opponent: Player) -> None:
             
         player.last_strike_was_hit = checkHit(shot, opponent) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
         
-        if player.last_strike_was_hit: # (TEAM1 - ALEX) Updates last hits if a shot hits, otherwise still hits
-            player.last_hits.append(shot)
-            
-        #(TEAM1 - ALEX)
-        #ADd Elif logic for when a ship is sunk, then empty the player.last_hits list
+        if player.last_strike_was_hit: # (TEAM2 - ALEX) Updates last hits if a shot hits, otherwise still hits
+            player.last_hits.append(shot)    
+        #(TEAM2 - ALEX)
+        #When a ship is sunk, then empty the player.last_hits list
+        for ship in opponent.ships:
+            if ship.destroyed and ship.hit_segments == player.last_hits:
+                player.last_hits = []
 
         player.strike_attempts.append(shot) # Add the shot taken to the player's strike attempts
         
