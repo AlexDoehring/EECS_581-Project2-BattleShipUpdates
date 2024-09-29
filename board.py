@@ -127,7 +127,7 @@ def shootShip(opponent, ai=None) -> str: #If ai parameter is passed, calls ai sh
 
     
 #Gianni Louisa Authored, chatgpt assisted
-def checkWin(player): #Alex: Added player parameter to print correct player's win
+def checkWin(player, opponent): #Alex: Added player parameter to print correct player's win
     """
         checkWin()    
     
@@ -146,7 +146,7 @@ def checkWin(player): #Alex: Added player parameter to print correct player's wi
         print("======================================")#print-out
         print("    All enemy ships have been sunk!")#print-out
         print("======================================\n")#print-out
-        printFinalBoards() #prints the final boards for each player after the game is over
+        printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
         return False  # The game ends when player 1 wins
     
     # Check if all ships of player_one are destroyed
@@ -158,7 +158,7 @@ def checkWin(player): #Alex: Added player parameter to print correct player's wi
         print("======================================")#print-out
         print("    All enemy ships have been sunk!")#print-out
         print("======================================\n")#print-out
-        printFinalBoards() #prints the final boards for each player after the game is over
+        printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
         return False  # The game ends when player 0 wins
     
     return True  # The game continues if neither player has won yet
