@@ -100,6 +100,7 @@ def shootShip(opponent, ai=None) -> str: #If ai parameter is passed, calls ai sh
 
     if ai:  # If ai_shot is provided, use it
         shot = ai.shootShip(opponent)
+        return shot
     else:  # Otherwise, prompt the human player
         print("Choose your coordinate to shoot!")  # Print a guiding statement to the user
         while True: # Loop to validate the input coordinate
@@ -353,10 +354,10 @@ def takeTurn(player: Player, opponent: Player) -> None:
             break # Break out of the loop
         print("Shot already taken.\n") # Notify player that the shot was a duplicate
     player.last_strike_was_hit = checkHit(shot, opponent) # Check to see whether the shot was a hit or miss (TEAM2- JAKE) then store value in player object
-    if player.last_strike_was_hit: # (TEAM1 - ALEX) Updates last hits if a shot hits, otherwise still hits
+    if player.last_strike_was_hit: # (TEAM2 - ALEX) Updates last hits if a shot hits, otherwise still hits
         player.last_hits.append(shot)
         
-    #(TEAM1 - ALEX)
+    #(TEAM2 - ALEX)
     #ADd Elif logic for when a ship is sunk, then empty the player.last_hits list
     
     

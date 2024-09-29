@@ -34,18 +34,18 @@ class Ai(Player):
     def shootShip(self, opponent):
         if self.difficulty == 'easy':      # Easy difficulty (continuous random shots)
             while True:
-                col = columns[random.randint(0, 9)]
-                row = str(random.randint(1, 10))
-                shot = row + col
-                if shot not in self.strike_attempts:
-                    self.strike_attempts.append(shot)
-                    break
-            return shot
+                col = columns[random.randint(0, 9)] #Grab random column
+                row = str(random.randint(1, 10)) #Grab random row
+                shot = row + col #append both to make shot coordinate
+                if shot not in self.strike_attempts: #if the shot has not already been shot
+                    self.strike_attempts.append(shot) #append to shot attempts
+                    break #break out of the loop
+            return shot #return the shot
         elif self.difficulty == 'medium':  # Medium difficulty (random until hit, then adjacent)
             if self.last_hits: #If a shit was hit recently, shoot orthoganally
                 if len(self.last_hits) == 1: #if just one ship, shoot randomly above or below
-                    last_col = self.last_hits[0][0]
-                    last_row = int(self.last_hits[0][1:])
+                    last_col = self.last_hits[0][0] #grab the column
+                    last_row = int(self.last_hits[0][1:]) #
                     possible_shots = []
                     
                     # Add above coordinate
