@@ -137,7 +137,7 @@ def checkWin(player, opponent, turn): #Alex: Added player parameter to print cor
         Returns False if game is won and should end.
     """
     if not isinstance(player, Ai) and not isinstance(opponent, Ai):
-        # Check if all ships of player_zero are destroyed
+       
         if turn == 0:
         # Check if all ships of player_one are destroyed
             if all(ship.destroyed for ship in player.ships):#for every ship in player_one's ships, check if they are true for destroyed
@@ -151,6 +151,7 @@ def checkWin(player, opponent, turn): #Alex: Added player parameter to print cor
                 printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
                 return False  # The game ends when player 0 wins
         else: 
+        # Check if all ships of player_zero are destroyed
             if all(ship.destroyed for ship in opponent.ships):#for every ship in player_zero's ships, check if they are true for destroyed
                 print("======================================")#print-out
                 print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
@@ -163,8 +164,8 @@ def checkWin(player, opponent, turn): #Alex: Added player parameter to print cor
                 return False  # The game ends when player 1 wins
     else:
         if turn == 0:
-                       
-            if all(ship.destroyed for ship in opponent.ships): #for every ship in player_zero's ships, check if they are true for destroyed
+        #Check if all of AI's ships are destroyed          
+            if all(ship.destroyed for ship in opponent.ships): #for every ship in AI's ships, check if they are true for destroyed
                 print("======================================") #print-out
                 print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
                 print("======================================")#print-out
@@ -175,7 +176,8 @@ def checkWin(player, opponent, turn): #Alex: Added player parameter to print cor
                 printFinalBoards(player, opponent) #prints the final boards for each player after the game is over
                 return False  # The game ends when player 0 wins
         else:
-            if all(ship.destroyed for ship in opponent.ships):#for every ship in player_zero's ships, check if they are true for destroyed
+        #Check if all of Players ships are destroyed
+            if all(ship.destroyed for ship in opponent.ships):#for every ship in player's ships, check if they are true for destroyed
                 print("======================================")#print-out
                 print("🎉🎉🎉  CONGRATULATIONS!  🎉🎉🎉")#print-out
                 print("======================================")#print-out
